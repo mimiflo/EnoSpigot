@@ -10,7 +10,7 @@ index 9c0fdf00d36a48f4f905db9bd760db898fac7f3f..ff5f1a64d56874e7edeaf2de63e09845
 +++ b/build.gradle.kts
 @@ -12,6 +12,12 @@ repositories {
  dependencies {
-     implementation(project(":pandaspigot-api"))
+     implementation(project(":enospigot-api"))
  
 +    // PandaSpigot start - Configuration
 +    implementation("com.hpfxd.configurate:configurate-eo-yaml:1.0.0") {

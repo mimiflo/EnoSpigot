@@ -11,7 +11,7 @@ index 0000000000000000000000000000000000000000..d05f6cfa9d47a9990911377002a546a0
 +++ b/build.gradle.kts
 @@ -0,0 +1,132 @@
 +plugins {
-+    id("pandaspigot.conventions")
++    id("enospigot.conventions")
 +    id("com.gradleup.shadow") version "9.4.1"
 +}
 +
@@ -22,7 +22,7 @@ index 0000000000000000000000000000000000000000..d05f6cfa9d47a9990911377002a546a0
 +}
 +
 +dependencies {
-+    implementation(project(":pandaspigot-api"))
++    implementation(project(":enospigot-api"))
 +
 +    // Minecraft libraries:
 +    implementation("com.mojang:netty:1.7.7")
@@ -49,7 +49,7 @@ index 0000000000000000000000000000000000000000..d05f6cfa9d47a9990911377002a546a0
 +fun TaskContainer.registerRunTask(
 +    name: String, block: JavaExec.() -> Unit
 +): TaskProvider<JavaExec> = register<JavaExec>(name) {
-+    group = "pandaspigot"
++    group = "enospigot"
 +    standardInput = System.`in`
 +    workingDir = rootProject.layout.projectDirectory.dir(
 +        providers.gradleProperty("runWorkDir").orElse("run")

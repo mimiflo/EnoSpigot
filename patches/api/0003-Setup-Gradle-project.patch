@@ -11,7 +11,7 @@ index 0000000000000000000000000000000000000000..260e26967f8b8b0d617345eea3ed9a72
 +++ b/build.gradle.kts
 @@ -0,0 +1,128 @@
 +plugins {
-+    id("pandaspigot.conventions")
++    id("enospigot.conventions")
 +    `maven-publish`
 +}
 +

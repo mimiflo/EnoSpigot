@@ -7,6 +7,6 @@ fun setupSubproject(name: String, dir: String) {
     project(":$name").projectDir = file(dir)
 }
 
-setupSubproject("pandaspigot-server", "EnoSpigot-Server")
-setupSubproject("pandaspigot-api", "EnoSpigot-API")
+setupSubproject("enospigot-server", "EnoSpigot-Server")
+setupSubproject("enospigot-api", "EnoSpigot-API")
 setupSubproject("paperclip", "paperclip")

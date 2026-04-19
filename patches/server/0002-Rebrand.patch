@@ -39,7 +39,7 @@ index 3a4b14246bb99b989a4685242ccedd0030e481aa..da66025a18b23e249ce13a8b998d24b1
          String result = "Unknown-Version";
  
 -        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/org.github.paperspigot/paperspigot-api/pom.properties");
-+        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/com.hpfxd.pandaspigot/pandaspigot-api/pom.properties");
++        InputStream stream = Bukkit.class.getClassLoader().getResourceAsStream("META-INF/maven/com.enofight.enospigot/enospigot-api/pom.properties");
          Properties properties = new Properties();
  
          if (stream != null) {
