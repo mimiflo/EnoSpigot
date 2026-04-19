@@ -8,7 +8,7 @@ import java.util.Properties
 tasks {
     register<Jar>("paperclipJar") {
         outputs.upToDateWhen { false }
-        dependsOn("shadowJar", ":enospigot-server:remap")
+        dependsOn("shadowJar", ":pandaspigot-server:remap")
 
         from(zipTree((tasks["shadowJar"] as Jar).archiveFile.get()))
 
@@ -24,7 +24,7 @@ tasks {
             }
         }
 
-        val inTask = project(":enospigot-server").tasks["remap"] as RemapTask
+        val inTask = project(":pandaspigot-server").tasks["remap"] as RemapTask
         val vanillaJar = project.rootProject.layout.projectDirectory.file("base/mc-dev/1.8.8.jar").asFile
 
         doFirst {

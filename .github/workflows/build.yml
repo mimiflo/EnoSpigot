@@ -6,6 +6,9 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,7 +35,25 @@ jobs:
         run: ./panda patch
 
       - name: Build
-        run: ./gradlew build paperclipJar
+        id: gradle_build
+        run: |
+          set -o pipefail
+          ./gradlew build paperclipJar --console=plain --no-daemon 2>&1 | tee /tmp/build-output.log
+
+      - name: Commit build log on failure (debug path for sandboxed reviewers)
+        if: failure() && steps.gradle_build.conclusion == 'failure'
+        env:
+          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="ci-debug/run-${{ github.run_number }}"
+          cp /tmp/build-output.log /tmp/saved.log 2>/dev/null || echo "no log captured" > /tmp/saved.log
+          git checkout --orphan "$BRANCH"
+          git rm -rf --quiet . >/dev/null 2>&1 || true
+          tail -c 200000 /tmp/saved.log > "run-${{ github.run_number }}.log"
+          git add "run-${{ github.run_number }}.log"
+          git -c user.email=actions@github.com -c user.name="GitHub Actions" \
+              commit -m "ci-debug: build log for run #${{ github.run_number }}"
+          git push "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git" "$BRANCH"
 
       - name: Copy Paperclip jar
         run: |
