@@ -18,6 +18,14 @@ tasks {
         options.encoding = "UTF-8"
     }
 
+    // Reproducible jars — identical source produces identical bytes.
+    // Prevents EnoInfrastructure sync from committing no-op jar updates
+    // (empty EnoSpigot commit -> identical jar -> sha256 unchanged -> no deploy).
+    withType<AbstractArchiveTask>().configureEach {
+        isPreserveFileTimestamps = false
+        isReproducibleFileOrder = true
+    }
+
     java {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

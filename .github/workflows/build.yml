@@ -36,9 +36,17 @@ jobs:
 
       - name: Build
         id: gradle_build
+        env:
+          # Gradle daemon + build cache + configuration cache cut rebuild
+          # time from ~4 min to ~1-2 min on warm caches.
+          GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true"
         run: |
           set -o pipefail
-          ./gradlew build paperclipJar --console=plain --no-daemon 2>&1 | tee /tmp/build-output.log
+          ./gradlew build paperclipJar \
+            --console=plain \
+            --build-cache \
+            --parallel \
+            2>&1 | tee /tmp/build-output.log
 
       - name: Commit build log on failure (debug path for sandboxed reviewers)
         if: failure() && steps.gradle_build.conclusion == 'failure'
@@ -94,6 +102,25 @@ jobs:
             --latest \
             "./enospigot.jar#enospigot.jar"
 
+          # Prune old build-N releases — keep the 20 most recent for rollback.
+          # Without this, the releases tab grows unboundedly.
+          echo "Pruning build-N releases (keeping last 20)..."
+          gh release list --limit 200 --json tagName,createdAt \
+            | python3 -c "
+import sys, json
+rels = json.load(sys.stdin)
+builds = sorted(
+    [r for r in rels if r['tagName'].startswith('build-')],
+    key=lambda r: r['createdAt'],
+    reverse=True,
+)
+for r in builds[20:]:
+    print(r['tagName'])
+" | while read -r tag; do
+            echo "  deleting $tag"
+            gh release delete "$tag" --yes --cleanup-tag 2>/dev/null || true
+          done
+
       # ─── Notify EnoInfrastructure (best-effort, works if PAT present) ───
       # Requires secret ENOINFRA_DISPATCH_TOKEN with Contents R/W on mimiflo/EnoInfrastructure.
       # If missing, EnoInfrastructure polls every 5 min as fallback.
@@ -104,7 +131,7 @@ jobs:
           GH_PAT: ${{ secrets.ENOINFRA_DISPATCH_TOKEN }}
         run: |
           if [ -z "$GH_PAT" ]; then
-            echo "ENOINFRA_DISPATCH_TOKEN not set — skipping dispatch (polling fallback will kick in within 5 min)"
+            echo "ENOINFRA_DISPATCH_TOKEN not set — skipping dispatch (polling fallback will kick in within 15 min)"
             exit 0
           fi
           curl -fsS -X POST \
