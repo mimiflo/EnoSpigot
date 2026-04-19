@@ -111,13 +111,13 @@ if [ ! -d "base/Paper/PaperSpigot-Server" ]; then
     echo "Upstream directory does not exist. Did you forget to run 'panda setup'?"
     exit 1
 else
-    # Apply PandaSpigot
+    # Apply EnoSpigot
     (
-        applyPatch "base/Paper/PaperSpigot-API" PandaSpigot-API HEAD patches/api &&
-        applyPatch "base/Paper/PaperSpigot-Server" PandaSpigot-Server HEAD patches/server
+        applyPatch "base/Paper/PaperSpigot-API" EnoSpigot-API HEAD patches/api &&
+        applyPatch "base/Paper/PaperSpigot-Server" EnoSpigot-Server HEAD patches/server
         cd "$basedir"
     ) || (
-        echo "Failed to apply PandaSpigot Patches"
+        echo "Failed to apply EnoSpigot Patches"
         exit 1
     ) || exit 1
 fi

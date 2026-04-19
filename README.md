@@ -1,94 +1,68 @@
-# PandaSpigot [![Build](https://img.shields.io/github/actions/workflow/status/hpfxd/PandaSpigot/build.yml?branch=master&label=Build)](https://github.com/hpfxd/PandaSpigot/actions/workflows/build.yml) [![Discord](https://img.shields.io/discord/1048733138655924274?label=Discord)](https://discord.gg/m6vCCX6Hvr) [![Servers](https://img.shields.io/bstats/servers/15154?label=Servers)](https://bstats.org/plugin/bukkit/PandaSpigot/15154)
-Fork of Paper for 1.8.8 focused on improved performance and stability.
+# EnoSpigot
 
-## Highlights
-- **Backported API enhancements from newer versions**
-    - ServerTickStartEvent & ServerTickEndEvent
-    - PlayerChunkLoadEvent & PlayerChunkUnloadEvent
-    - PlayerHandshakeEvent
-    - EntityMoveEvent
+Fork of [PandaSpigot](https://github.com/hpfxd/PandaSpigot) for Minecraft 1.8.8,
+customized for the [Enofight](https://github.com/mimiflo/EnoInfrastructure) network.
 
-- **Greatly improved network performance**
-    - **Updating to Netty 4.1** offers the ability to use newer Java versions with epoll on Linux.
-    - **Improved flush handling** to massively improve entity tracker performance.
-    - **Support for Unix domain sockets** to avoid the overhead of TCP when using a proxy on the same machine.
+PandaSpigot itself is a fork of Paper 1.8.8, focused on performance and
+stability. EnoSpigot keeps that base and layers our own patches on top so we can
+modify the server however we need for Enofight.
 
-- **More configuration options**, such as:
-    - Customizable knockback
-    - World and player data saving
+## Why a fork?
 
-See a full list of patches [here](./patches/).
+Running a competitive 1.8 network means we need the freedom to patch the server
+itself — custom knockback, new events, protocol tweaks, etc. Forking
+PandaSpigot lets us:
 
-## Using
-You can download the latest pre-built server JAR by clicking the download button below.  
-[![Download](https://custom-icon-badges.demolab.com/badge/-Download-blue?style=for-the-badge&logo=download&logoColor=white)](https://downloads.hpfxd.com/v2/projects/pandaspigot/versions/1.8.8/builds/latest/downloads/paperclip)
-
-For support, please join our [Discord](https://discord.gg/m6vCCX6Hvr).
-
-## API 
-See our API patches [here](./patches/api/).  
-[![Javadocs](https://repo.hpfxd.com/api/badge/latest/releases/com/hpfxd/pandaspigot/pandaspigot-api?name=Javadocs)](https://repo.hpfxd.com/javadoc/releases/com/hpfxd/pandaspigot/pandaspigot-api/1.8.8-R0.1-SNAPSHOT/raw/index.html)
-<details>
-<summary>Maven</summary>
-
-```xml
-<repositories>
-    <repository>
-        <id>hpfxd-repo</id>
-        <url>https://repo.hpfxd.com/releases/</url>
-    </repository>
-</repositories>
-
-<dependencies>
-    <dependency>
-        <groupId>com.hpfxd.pandaspigot</groupId>
-        <artifactId>pandaspigot-api</artifactId>
-        <version>1.8.8-R0.1-SNAPSHOT</version>
-        <scope>provided</scope>
-    </dependency>
-</dependencies>
-```
-</details>
-
-<details>
-<summary>Gradle (kts)</summary>
-
-```kotlin
-repositories {
-    mavenCentral()
-    maven(url = "https://repo.hpfxd.com/releases/")
-}
-
-dependencies {
-    compileOnly("com.hpfxd.pandaspigot:pandaspigot-api:1.8.8-R0.1-SNAPSHOT")
-}
-```
-</details>
+- Add our own patches in `patches/server/` and `patches/api/`
+- Pull upstream improvements from PandaSpigot whenever we want
+- Ship a single `enospigot-paperclip.jar` we fully control
 
 ## Building
-To compile PandaSpigot, you'll need:
-- JDK 17 (required to run the decompiler)
+
+Requirements:
+- JDK 17 (required to run the decompiler — the output JAR stays Java 8 compatible)
 - Git
 - Bash
 
-🧩 Although JDK 17 is required for building, the compiled JAR remains fully compatible with Java 8.
+```bash
+./panda jar
+```
 
-Building, patching, and compiling are all done through the main `panda` script.
+Produces `paperclip.jar` at the repository root. Copy it into
+`EnoInfrastructure/docker/gameserver/enospigot.jar` to ship it with the
+gameserver image.
 
-PandaSpigot can be built by running `./panda jar`, and you will find the final Paperclip jar in `paperclip.jar`
+## Useful commands
 
-## Contributing
-You can mostly follow [Paper's contributing guide](https://github.com/PaperMC/Paper-archive/blob/ver/1.16.5/CONTRIBUTING.md), just remember:
-- Multi-line changes start with `// PandaSpigot start` and end with `// PandaSpigot end`
-- If the change isn't obvious, add a small explanation like this: `// PandaSpigot start - reason`
-- One-line changes should have `// PandaSpigot` at the end of the line.
-- Follow Java code style (aka. Oracle style), with some exceptions:
-  - If you are modifying upstream files, keep your diff size minimal. Going over 80 characters per line is fine to make this happen.
-  - When in doubt or the code around your change is in a clearly different style, use the same style as the surrounding code.
+- `./panda setup` — remap, decompile, apply patches (first run only)
+- `./panda jar` — apply patches and build (alias `./panda j`)
+- `./panda patch` — apply patches without building (alias `./panda p`)
+- `./panda rebuild` — regenerate patches from current source state (alias `./panda rb`)
+- `./panda clean` — remove generated dirs (alias `./panda c`)
 
-When contributing, please think about the side effects of any changes you write.
-Plugin compatibility is important, and we wish to minimize any breakage.
+## Contributing patches
 
-Please do not open pull requests for features that you cannot justify the existence of,
-and the added maintenance costs of that come along with them. If you are thinking of
-adding a feature that may be controversial, please open an issue first!
+Add new changes as patches on top of the existing stack. When modifying
+upstream (Paper/PandaSpigot) code:
+
+- Multi-line changes: `// EnoSpigot start` / `// EnoSpigot end`
+- Multi-line with reason: `// EnoSpigot start - <reason>`
+- One-line: `// EnoSpigot` at end of line
+
+Existing PandaSpigot patches keep their `// PandaSpigot` markers so upstream
+merges stay clean.
+
+## Upstream
+
+Remote name `upstream` points at `hpfxd/PandaSpigot`. To pull their latest:
+
+```bash
+git fetch upstream
+git merge upstream/master
+```
+
+Resolve any patch conflicts, then `./panda rebuild` to refresh `patches/`.
+
+## License
+
+Inherited from PandaSpigot / Paper / Spigot. See `LICENSE.md`.
