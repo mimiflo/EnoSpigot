@@ -7,7 +7,7 @@
  * MIT License
  */
 
-package com.hpfxd.pandaspigot.paperclip;
+package com.enofight.enospigot.paperclip;
 
 import java.io.File;
 import java.io.IOException;

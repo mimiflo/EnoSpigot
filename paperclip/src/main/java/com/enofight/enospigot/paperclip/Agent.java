@@ -7,7 +7,7 @@
  * MIT License
  */
 
-package com.hpfxd.pandaspigot.paperclip;
+package com.enofight.enospigot.paperclip;
 
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.InvocationTargetException;
