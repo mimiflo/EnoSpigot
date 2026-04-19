@@ -106,20 +106,11 @@ jobs:
           # Without this, the releases tab grows unboundedly.
           echo "Pruning build-N releases (keeping last 20)..."
           gh release list --limit 200 --json tagName,createdAt \
-            | python3 -c "
-import sys, json
-rels = json.load(sys.stdin)
-builds = sorted(
-    [r for r in rels if r['tagName'].startswith('build-')],
-    key=lambda r: r['createdAt'],
-    reverse=True,
-)
-for r in builds[20:]:
-    print(r['tagName'])
-" | while read -r tag; do
-            echo "  deleting $tag"
-            gh release delete "$tag" --yes --cleanup-tag 2>/dev/null || true
-          done
+            | python3 -c 'import sys,json; rs=sorted([r for r in json.load(sys.stdin) if r["tagName"].startswith("build-")], key=lambda r: r["createdAt"], reverse=True); [print(r["tagName"]) for r in rs[20:]]' \
+            | while read -r tag; do
+                echo "  deleting $tag"
+                gh release delete "$tag" --yes --cleanup-tag 2>/dev/null || true
+              done
 
       # ─── Notify EnoInfrastructure (best-effort, works if PAT present) ───
       # Requires secret ENOINFRA_DISPATCH_TOKEN with Contents R/W on mimiflo/EnoInfrastructure.
