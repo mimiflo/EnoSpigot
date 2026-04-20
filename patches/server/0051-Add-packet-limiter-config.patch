@@ -148,7 +148,7 @@ index 7db0c0097bcb38e4e49ab12879c230770e47334d..fcf7738c75f21ad23693d903b476c65b
 --- a/src/main/java/com/hpfxd/pandaspigot/config/PandaSpigotConfig.java
 +++ b/src/main/java/com/hpfxd/pandaspigot/config/PandaSpigotConfig.java
 @@ -38,7 +38,8 @@ public class PandaSpigotConfig {
-                         .header("This is the configuration file for PandaSpigot.\n" +
+                         .header("This is the configuration file for EnoSpigot.\n" +
                                  "Use caution when modifying settings, as some may impact gameplay in non-obvious ways.")
                          .mapFactory(MapFactories.insertionOrdered())
 -                        .serializers(build -> build.registerAnnotatedObjects(ObjectMapper.factoryBuilder()
