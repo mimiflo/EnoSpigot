@@ -1,0 +1,240 @@
+
+Welcome to Gradle 9.4.1!
+
+Here are the highlights of this release:
+ - Java 26 support
+ - Non-class-based JVM tests
+ - Enhanced console progress bar
+
+For more details see https://docs.gradle.org/9.4.1/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :build-logic:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-logic:generateExternalPluginSpecBuilders FROM-CACHE
+> Task :build-logic:extractPrecompiledScriptPluginPlugins FROM-CACHE
+> Task :build-logic:compilePluginsBlocks FROM-CACHE
+> Task :build-logic:generatePrecompiledScriptPluginAccessors FROM-CACHE
+> Task :build-logic:generateScriptPluginAdapters FROM-CACHE
+> Task :build-logic:compileKotlin FROM-CACHE
+> Task :build-logic:compileJava NO-SOURCE
+> Task :build-logic:pluginDescriptors
+> Task :build-logic:processResources
+> Task :build-logic:classes
+> Task :build-logic:jar
+> Task :enospigot-server:processResources
+> Task :enospigot-server:prepareTestServerDir
+> Task :enospigot-server:processTestResources NO-SOURCE
+> Task :paperclip:compileJava FROM-CACHE
+> Task :paperclip:processResources NO-SOURCE
+> Task :paperclip:classes UP-TO-DATE
+> Task :paperclip:jar
+> Task :paperclip:compileJava9Java FROM-CACHE
+> Task :paperclip:processJava9Resources NO-SOURCE
+> Task :paperclip:java9Classes UP-TO-DATE
+> Task :paperclip:shadowJar
+> Task :paperclip:assemble
+> Task :paperclip:compileTestJava NO-SOURCE
+> Task :paperclip:prepareTestServerDir
+> Task :paperclip:processTestResources NO-SOURCE
+> Task :paperclip:testClasses UP-TO-DATE
+> Task :paperclip:test NO-SOURCE
+> Task :paperclip:check UP-TO-DATE
+> Task :paperclip:build
+
+> Task :enospigot-api:compileJava
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :enospigot-api:processResources NO-SOURCE
+> Task :enospigot-api:classes
+> Task :enospigot-api:generateApiVersioningFile
+> Task :enospigot-api:jar
+
+> Task :enospigot-api:javadoc
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-API/src/main/java/org/bukkit/material/Door.java:14: warning: Tag @see: reference not found: Material.WOODEN_DOOR
+ * @see Material.WOODEN_DOOR
+   ^
+1 warning
+
+> Task :enospigot-server:compileJava FAILED
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/org/spigotmc/TicksPerSecondCommand.java:167: error: incompatible types: BaseComponent[] cannot be converted to String
+        BaseComponent[] parts = new ComponentBuilder( "" ).append( TextComponent.fromLegacyText( text ) ).create();
+                                                                                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntitySheep.java:74: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+        this.datawatcher.a(16, new Byte((byte) 0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntitySpider.java:32: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+        this.datawatcher.a(16, new Byte((byte) 0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartAbstract.java:75: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        this.datawatcher.a(17, new Integer(0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartAbstract.java:76: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        this.datawatcher.a(18, new Integer(1));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartAbstract.java:77: warning: [removal] Float(float) in Float has been deprecated and marked for removal
+        this.datawatcher.a(19, new Float(0.0F));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartAbstract.java:78: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        this.datawatcher.a(20, new Integer(0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartAbstract.java:79: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        this.datawatcher.a(21, new Integer(6));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityBoat.java:60: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        this.datawatcher.a(17, new Integer(0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityBoat.java:61: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        this.datawatcher.a(18, new Integer(1));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityBoat.java:62: warning: [removal] Float(float) in Float has been deprecated and marked for removal
+        this.datawatcher.a(19, new Float(0.0F));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityBat.java:18: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+        this.datawatcher.a(16, new Byte((byte) 0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityBlaze.java:32: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+        this.datawatcher.a(16, new Byte((byte) 0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityEnderman.java:58: warning: [removal] Short(short) in Short has been deprecated and marked for removal
+        this.datawatcher.a(16, new Short((short) 0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityEnderman.java:59: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+        this.datawatcher.a(17, new Byte((byte) 0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityEnderman.java:60: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+        this.datawatcher.a(18, new Byte((byte) 0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntitySkeleton.java:37: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+        this.datawatcher.a(13, new Byte((byte) 0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWolf.java:90: warning: [removal] Float(float) in Float has been deprecated and marked for removal
+        this.datawatcher.a(18, new Float(this.getHealth()));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWolf.java:91: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+        this.datawatcher.a(19, new Byte((byte) 0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWolf.java:92: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+        this.datawatcher.a(20, new Byte((byte) EnumColor.RED.getColorIndex()));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWither.java:51: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        this.datawatcher.a(17, new Integer(0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWither.java:52: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        this.datawatcher.a(18, new Integer(0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWither.java:53: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        this.datawatcher.a(19, new Integer(0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWither.java:54: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        this.datawatcher.a(20, new Integer(0));
+                               ^
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartFurnace.java:23: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+        this.datawatcher.a(16, new Byte((byte) 0));
+                               ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+1 error
+24 warnings
+
+[Incubating] Problems report is available at: file:///home/runner/work/EnoSpigot/EnoSpigot/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':enospigot-server:compileJava'.
+> Compilation failed; see the compiler output below.
+  Note: Recompile with -Xlint:deprecation for details.
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/org/spigotmc/TicksPerSecondCommand.java:167: error: incompatible types: BaseComponent[] cannot be converted to String
+          BaseComponent[] parts = new ComponentBuilder( "" ).append( TextComponent.fromLegacyText( text ) ).create();
+                                                                                                 ^
+  Note: Recompile with -Xlint:unchecked for details.
+  Note: Some input files use or override a deprecated API.
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntitySheep.java:74: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+          this.datawatcher.a(16, new Byte((byte) 0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntitySpider.java:32: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+          this.datawatcher.a(16, new Byte((byte) 0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartAbstract.java:75: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+          this.datawatcher.a(17, new Integer(0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartAbstract.java:76: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+          this.datawatcher.a(18, new Integer(1));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartAbstract.java:77: warning: [removal] Float(float) in Float has been deprecated and marked for removal
+          this.datawatcher.a(19, new Float(0.0F));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartAbstract.java:78: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+          this.datawatcher.a(20, new Integer(0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartAbstract.java:79: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+          this.datawatcher.a(21, new Integer(6));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityBoat.java:60: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+          this.datawatcher.a(17, new Integer(0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityBoat.java:61: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+          this.datawatcher.a(18, new Integer(1));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityBoat.java:62: warning: [removal] Float(float) in Float has been deprecated and marked for removal
+          this.datawatcher.a(19, new Float(0.0F));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityBat.java:18: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+          this.datawatcher.a(16, new Byte((byte) 0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityBlaze.java:32: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+          this.datawatcher.a(16, new Byte((byte) 0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityEnderman.java:58: warning: [removal] Short(short) in Short has been deprecated and marked for removal
+          this.datawatcher.a(16, new Short((short) 0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityEnderman.java:59: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+          this.datawatcher.a(17, new Byte((byte) 0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityEnderman.java:60: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+          this.datawatcher.a(18, new Byte((byte) 0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntitySkeleton.java:37: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+          this.datawatcher.a(13, new Byte((byte) 0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWolf.java:90: warning: [removal] Float(float) in Float has been deprecated and marked for removal
+          this.datawatcher.a(18, new Float(this.getHealth()));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWolf.java:91: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+          this.datawatcher.a(19, new Byte((byte) 0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWolf.java:92: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+          this.datawatcher.a(20, new Byte((byte) EnumColor.RED.getColorIndex()));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWither.java:51: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+          this.datawatcher.a(17, new Integer(0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWither.java:52: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+          this.datawatcher.a(18, new Integer(0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWither.java:53: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+          this.datawatcher.a(19, new Integer(0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityWither.java:54: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+          this.datawatcher.a(20, new Integer(0));
+                                 ^
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/net/minecraft/server/EntityMinecartFurnace.java:23: warning: [removal] Byte(byte) in Byte has been deprecated and marked for removal
+          this.datawatcher.a(16, new Byte((byte) 0));
+                                 ^
+  Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+  Note: Some input files use unchecked or unsafe operations.
+  1 error
+  24 warnings
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 34s
+21 actionable tasks: 13 executed, 8 from cache
