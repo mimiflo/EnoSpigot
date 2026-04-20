@@ -35,6 +35,15 @@ index e91e1d8c1215d19a78611d3c8302ed9634bfbda5..62f36e8f9d033c82318141e4edc0636c
  
  public class VersionCommand extends BukkitCommand {
      public VersionCommand(String name) {
+@@ -166,7 +166,7 @@ public class VersionCommand extends BukkitCommand {
+                 return;
+             }
+             versionWaiters.add(sender);
+-            sender.sendMessage("Checking version, please wait...");
++            // PandaSpigot - silenced "Checking version, please wait..."
+             if (!versionTaskStarted) {
+                 versionTaskStarted = true;
+                 new Thread(new Runnable() {
 @@ -185,8 +190,33 @@ public class VersionCommand extends BukkitCommand {
      private void obtainVersion() {
          String version = Bukkit.getVersion();
@@ -44,9 +53,9 @@ index e91e1d8c1215d19a78611d3c8302ed9634bfbda5..62f36e8f9d033c82318141e4edc0636c
 +            String[] parts = version.substring(version.indexOf("-", 4) + 1).split("[-\\s]");
 +            int distance;
 +            try {
-+                distance = fetchDownloadApiDistance(Integer.parseInt(parts[0]));
++                distance = fetchGitDistance("mimiflo/EnoSpigot", "master", parts.length > 1 ? parts[1] : parts[0]);
 +            } catch (NumberFormatException e) {
-+                distance = fetchGitDistance("mimiflo/EnoSpigot", "master", parts[0]);
++                distance = -1;
 +            }
 +
 +            switch (distance) {
