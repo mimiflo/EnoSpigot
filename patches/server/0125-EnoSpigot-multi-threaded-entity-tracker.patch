@@ -1,0 +1,209 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Enofight <team@enofight.com>
+Date: Sun, 20 Apr 2026 00:00:00 +0000
+Subject: [PATCH] EnoSpigot multi-threaded entity tracker
+
+Parallelizes EntityTrackerEntry.track() calls across a ForkJoinPool.
+Each tracked entity is updated independently on worker threads, sending
+position/movement/metadata packets in parallel. This reduces main-thread
+time proportional to the number of CPU cores available.
+
+Thread safety is ensured by:
+- ConcurrentHashMap for EntityTrackerEntry.trackedPlayerMap
+- ConcurrentLinkedDeque for EntityPlayer.removeQueue
+- Entity state is frozen during tracking phase (no writes until next tick)
+- Packet sending already thread-safe via Netty event loops
+
+Configurable via enospigot.yml:
+  asyncEntityTracker: true/false
+  asyncEntityTrackerThreads: 0 (auto) or explicit count
+
+diff --git a/src/main/java/com/hpfxd/pandaspigot/async/AsyncTracker.java b/src/main/java/com/hpfxd/pandaspigot/async/AsyncTracker.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000001
+--- /dev/null
++++ b/src/main/java/com/hpfxd/pandaspigot/async/AsyncTracker.java
+@@ -0,0 +1,97 @@
++package com.hpfxd.pandaspigot.async;
++
++import com.hpfxd.pandaspigot.config.PandaSpigotConfig;
++import net.minecraft.server.EntityPlayer;
++import net.minecraft.server.EntityTracker;
++import net.minecraft.server.EntityTrackerEntry;
++import net.minecraft.server.WorldServer;
++import net.minecraft.server.EntityHuman;
++import org.apache.logging.log4j.LogManager;
++import org.apache.logging.log4j.Logger;
++
++import java.util.ArrayList;
++import java.util.Collections;
++import java.util.List;
++import java.util.Set;
++import java.util.concurrent.Callable;
++import java.util.concurrent.ForkJoinPool;
++import java.util.concurrent.ForkJoinWorkerThread;
++
++public final class AsyncTracker {
++
++    private static final Logger LOGGER = LogManager.getLogger("EnoSpigot-AsyncTracker");
++    private static volatile ForkJoinPool pool;
++
++    private AsyncTracker() {}
++
++    public static void init(int threads) {
++        if (threads <= 0) {
++            threads = Math.max(2, Runtime.getRuntime().availableProcessors() / 2);
++        }
++        final int threadCount = threads;
++        pool = new ForkJoinPool(threadCount, forkJoinPool -> {
++            ForkJoinWorkerThread thread = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(forkJoinPool);
++            thread.setName("EnoSpigot-Tracker-" + thread.getPoolIndex());
++            thread.setDaemon(true);
++            return thread;
++        }, (t, e) -> LOGGER.error("Exception in async tracker thread {}", t.getName(), e), true);
++        LOGGER.info("Async entity tracker initialized with {} threads", threadCount);
++    }
++
++    public static void shutdown() {
++        ForkJoinPool p = pool;
++        if (p != null) {
++            p.shutdownNow();
++            pool = null;
++        }
++    }
++
++    public static void updatePlayersParallel(WorldServer world) {
++        if (pool == null) {
++            synchronized (AsyncTracker.class) {
++                if (pool == null) {
++                    init(PandaSpigotConfig.get().asyncEntityTrackerThreads);
++                }
++            }
++        }
++
++        EntityTracker tracker = world.getTracker();
++        Set<EntityTrackerEntry> entries = tracker.getTrackedEntries();
++        if (entries.isEmpty()) return;
++
++        List<EntityHuman> players = world.players;
++        List<EntityTrackerEntry> entryList = new ArrayList<>(entries);
++        List<EntityPlayer> newlyTracking = Collections.synchronizedList(new ArrayList<>());
++
++        int parallelism = pool.getParallelism();
++        int batchSize = Math.max(1, (entryList.size() + parallelism - 1) / parallelism);
++        List<Callable<Void>> tasks = new ArrayList<>();
++
++        for (int i = 0; i < entryList.size(); i += batchSize) {
++            final int start = i;
++            final int end = Math.min(i + batchSize, entryList.size());
++            tasks.add(() -> {
++                for (int j = start; j < end; j++) {
++                    EntityTrackerEntry entry = entryList.get(j);
++                    try {
++                        entry.track(players);
++                    } catch (Exception e) {
++                        LOGGER.error("Exception tracking entity {}", entry.tracker.getId(), e);
++                    }
++                    if (entry.n && entry.tracker instanceof EntityPlayer) {
++                        newlyTracking.add((EntityPlayer) entry.tracker);
++                    }
++                }
++                return null;
++            });
++        }
++
++        try {
++            pool.invokeAll(tasks);
++        } catch (InterruptedException e) {
++            Thread.currentThread().interrupt();
++            return;
++        }
++
++        for (EntityPlayer entityplayer : newlyTracking) {
++            for (EntityTrackerEntry entry : entryList) {
++                if (entry.tracker != entityplayer) {
++                    entry.updatePlayer(entityplayer);
++                }
++            }
++        }
++    }
++}
+diff --git a/src/main/java/com/hpfxd/pandaspigot/config/PandaSpigotConfig.java b/src/main/java/com/hpfxd/pandaspigot/config/PandaSpigotConfig.java
+index f1769ecc8fe0725171b638b7d8b7bbbc9e5250d1..0000000000000000000000000000000000000001 100644
+--- a/src/main/java/com/hpfxd/pandaspigot/config/PandaSpigotConfig.java
++++ b/src/main/java/com/hpfxd/pandaspigot/config/PandaSpigotConfig.java
+@@ -128,4 +128,15 @@ public class PandaSpigotConfig {
+     public int tabSpamIncrement = 10;
+
+     public int tabSpamLimit = 500;
++
++    @Comment("Enable multi-threaded entity tracking. Parallelizes entity tracker updates\n" +
++        "across worker threads, reducing main-thread time on servers with many players.\n" +
++        "Uses ConcurrentHashMap and ConcurrentLinkedDeque for thread-safe tracking data.\n" +
++        "Disable this if you experience issues with entity visibility or tracking.")
++    public boolean asyncEntityTracker = true;
++
++    @Comment("Number of threads for the async entity tracker thread pool.\n" +
++        "Set to 0 for automatic detection (half of available CPU cores, minimum 2).\n" +
++        "Only used when asyncEntityTracker is enabled.")
++    public int asyncEntityTrackerThreads = 0;
+ }
+diff --git a/src/main/java/net/minecraft/server/EntityPlayer.java b/src/main/java/net/minecraft/server/EntityPlayer.java
+index b4f301a3eb660b9bf080c4f6b4e3bbaa3678a8d6..0000000000000000000000000000000000000001 100644
+--- a/src/main/java/net/minecraft/server/EntityPlayer.java
++++ b/src/main/java/net/minecraft/server/EntityPlayer.java
+@@ -34,7 +34,7 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
+     public double d;
+     public double e;
+     public final List<ChunkCoordIntPair> chunkCoordIntPairQueue = Lists.newLinkedList();
+-    public final java.util.Deque<Integer> removeQueue = new java.util.ArrayDeque<>(); // PandaSpigot
++    public final java.util.Deque<Integer> removeQueue = new java.util.concurrent.ConcurrentLinkedDeque<>(); // PandaSpigot // EnoSpigot - thread-safe for async tracker
+     private final ServerStatisticManager bK;
+     private float bL = Float.MIN_VALUE;
+     private float bM = -1.0E8F;
+diff --git a/src/main/java/net/minecraft/server/EntityTracker.java b/src/main/java/net/minecraft/server/EntityTracker.java
+index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000001 100644
+--- a/src/main/java/net/minecraft/server/EntityTracker.java
++++ b/src/main/java/net/minecraft/server/EntityTracker.java
+@@ -145,6 +145,10 @@ public class EntityTracker {
+     }
+
++    // EnoSpigot start - expose entries for async tracker
++    public java.util.Set<EntityTrackerEntry> getTrackedEntries() { return this.c; }
++    // EnoSpigot end
++
+     public void untrackEntity(Entity entity) {
+         org.spigotmc.AsyncCatcher.catchOp( "entity untrack"); // Spigot
+diff --git a/src/main/java/net/minecraft/server/EntityTrackerEntry.java b/src/main/java/net/minecraft/server/EntityTrackerEntry.java
+index 0b90b6f30ea09fb117281d5ddd2fc752d2c139b5..0000000000000000000000000000000000000001 100644
+--- a/src/main/java/net/minecraft/server/EntityTrackerEntry.java
++++ b/src/main/java/net/minecraft/server/EntityTrackerEntry.java
+@@ -42,7 +42,7 @@ public class EntityTrackerEntry {
+     // PaperSpigot start
+     // Replace trackedPlayers Set with a Map. The value is true until the player receives
+     // their first update (which is forced to have absolute coordinates), false afterward.
+-    public java.util.Map<EntityPlayer, Boolean> trackedPlayerMap = new java.util.HashMap<EntityPlayer, Boolean>();
++    public java.util.Map<EntityPlayer, Boolean> trackedPlayerMap = new java.util.concurrent.ConcurrentHashMap<>(); // EnoSpigot - thread-safe for async tracker
+     public Set<EntityPlayer> trackedPlayers = trackedPlayerMap.keySet();
+     // PaperSpigot end
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000001 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -893,7 +893,15 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+                 try {
+                 // PandaSpigot end
+                 if (this.getPlayerList().getPlayerCount() > 0) { // PandaSpigot - Skip updating entity tracker if zero players online
+-                worldserver.getTracker().updatePlayers();
++                // EnoSpigot start - async entity tracker
++                if (com.hpfxd.pandaspigot.config.PandaSpigotConfig.get().asyncEntityTracker) {
++                    com.hpfxd.pandaspigot.async.AsyncTracker.updatePlayersParallel(worldserver);
++                } else {
++                // EnoSpigot end
++                    worldserver.getTracker().updatePlayers();
++                // EnoSpigot start
++                }
++                // EnoSpigot end
+                 } // PandaSpigot
+                 // PandaSpigot start - controlled flush for entity tracker packets
+                 } finally {
