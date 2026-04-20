@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Enofight <team@enofight.com>
+Date: Sun, 20 Apr 2026 00:00:00 +0000
+Subject: [PATCH] Enofight branded TPS command
+
+
+diff --git a/src/main/java/org/spigotmc/TicksPerSecondCommand.java b/src/main/java/org/spigotmc/TicksPerSecondCommand.java
+index 21fd7ef..abbd42c 100644
+--- a/src/main/java/org/spigotmc/TicksPerSecondCommand.java
++++ b/src/main/java/org/spigotmc/TicksPerSecondCommand.java
+@@ -23,14 +23,21 @@ public class TicksPerSecondCommand extends Command
+             return true;
+         }
+
+-        // PaperSpigot start - Further improve tick handling
++        // EnoSpigot - branded performance command
+         double[] tps = org.bukkit.Bukkit.spigot().getTPS();
+         String[] tpsAvg = new String[tps.length];
+
+          for ( int i = 0; i < tps.length; i++) {
+              tpsAvg[i] = format( tps[i] );
+         }
+-        sender.sendMessage( ChatColor.GOLD + "TPS from last 1m, 5m, 15m: " + org.apache.commons.lang.StringUtils.join(tpsAvg, ", "));
++        sender.sendMessage( "" + ChatColor.DARK_PURPLE + ChatColor.BOLD + "Enofight " + ChatColor.DARK_GRAY + "\u2014 " + ChatColor.GRAY + "TPS (1m, 5m, 15m): " + org.apache.commons.lang.StringUtils.join(tpsAvg, ChatColor.DARK_GRAY + ", "));
++
++        Runtime runtime = Runtime.getRuntime();
++        long usedMb = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
++        long maxMb = runtime.maxMemory() / 1048576L;
++        ChatColor memColor = usedMb < maxMb * 7 / 10 ? ChatColor.GREEN : usedMb < maxMb * 9 / 10 ? ChatColor.YELLOW : ChatColor.RED;
++        sender.sendMessage( ChatColor.DARK_GRAY + " \u25CF " + ChatColor.GRAY + "M\u00e9moire " + ChatColor.DARK_GRAY + "\u25b8 " + memColor + usedMb + ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + maxMb + ChatColor.DARK_GRAY + " MB");
++        // EnoSpigot end
+
+         return true;
+     }
