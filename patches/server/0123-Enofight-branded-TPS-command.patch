@@ -5,10 +5,10 @@ Subject: [PATCH] Enofight branded TPS command
 
 
 diff --git a/src/main/java/org/spigotmc/TicksPerSecondCommand.java b/src/main/java/org/spigotmc/TicksPerSecondCommand.java
-index 21fd7ef..a33fccf 100644
+index 21fd7ef..5986d3b 100644
 --- a/src/main/java/org/spigotmc/TicksPerSecondCommand.java
 +++ b/src/main/java/org/spigotmc/TicksPerSecondCommand.java
-@@ -1,8 +1,20 @@
+@@ -1,8 +1,19 @@
  package org.spigotmc;
  
 +import org.bukkit.Bukkit;
@@ -20,7 +20,6 @@ index 21fd7ef..a33fccf 100644
 +// EnoSpigot start - rich /tps command
 +import net.md_5.bungee.api.chat.BaseComponent;
 +import net.md_5.bungee.api.chat.ClickEvent;
-+import net.md_5.bungee.api.chat.ComponentBuilder;
 +import net.md_5.bungee.api.chat.HoverEvent;
 +import net.md_5.bungee.api.chat.TextComponent;
 +import java.lang.management.ManagementFactory;
@@ -29,7 +28,7 @@ index 21fd7ef..a33fccf 100644
  
  public class TicksPerSecondCommand extends Command
  {
-@@ -13,8 +25,15 @@ public class TicksPerSecondCommand extends Command
+@@ -13,8 +24,15 @@ public class TicksPerSecondCommand extends Command
          this.description = "Gets the current ticks per second for the server";
          this.usageMessage = "/tps";
          this.setPermission( "bukkit.command.tps" );
@@ -45,7 +44,7 @@ index 21fd7ef..a33fccf 100644
      @Override
      public boolean execute(CommandSender sender, String currentAlias, String[] args)
      {
-@@ -23,18 +42,199 @@ public class TicksPerSecondCommand extends Command
+@@ -23,18 +41,196 @@ public class TicksPerSecondCommand extends Command
              return true;
          }
  
@@ -55,56 +54,52 @@ index 21fd7ef..a33fccf 100644
 +        double[] tps = Bukkit.spigot().getTPS();
 +        boolean isPlayer = sender instanceof Player;
 +        boolean isOp = sender.isOp();
- 
--         for ( int i = 0; i < tps.length; i++) {
--             tpsAvg[i] = format( tps[i] );
++
 +        sender.sendMessage( "" );
 +        sender.sendMessage( ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "  Enofight " + ChatColor.DARK_GRAY + "/ " + ChatColor.GRAY + ChatColor.ITALIC + "Performances" );
 +        sender.sendMessage( "" );
 +
-+        // TPS line — coloured values, hover for graph
++        String tpsText = BAR + label( "TPS" ) + ARROW
++                + format( tps[0] ) + SEP + format( tps[1] ) + SEP + format( tps[2] )
++                + ChatColor.DARK_GRAY + "   (1m, 5m, 15m)";
++
 +        if ( isPlayer )
 +        {
-+            TextComponent tpsLine = component( BAR + label( "TPS" ) + ARROW
-+                    + format( tps[0] ) + SEP + format( tps[1] ) + SEP + format( tps[2] )
-+                    + ChatColor.DARK_GRAY + "   (1m, 5m, 15m)" );
++            TextComponent tpsLine = component( tpsText );
 +            tpsLine.setHoverEvent( hover( buildGraph( tps ) ) );
 +            ( (Player) sender ).spigot().sendMessage( tpsLine );
 +        }
 +        else
 +        {
-+            sender.sendMessage( BAR + label( "TPS" ) + ARROW
-+                    + format( tps[0] ) + SEP + format( tps[1] ) + SEP + format( tps[2] )
-+                    + ChatColor.DARK_GRAY + "   (1m, 5m, 15m)" );
-         }
--        sender.sendMessage( ChatColor.GOLD + "TPS from last 1m, 5m, 15m: " + org.apache.commons.lang.StringUtils.join(tpsAvg, ", "));
- 
-+        // Memory line — hover shows breakdown
++            sender.sendMessage( tpsText );
++        }
++
 +        long usedMb = ( Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory() ) / 1048576L;
 +        long maxMb = Runtime.getRuntime().maxMemory() / 1048576L;
 +        ChatColor memColor = colorFor( usedMb, maxMb );
-+        String memInline = memColor + "" + usedMb + ChatColor.DARK_GRAY + " / " + ChatColor.GRAY + maxMb + ChatColor.DARK_GRAY + " MB";
++        String memText = BAR + label( "M\u00e9moire" ) + ARROW
++                + memColor + usedMb + ChatColor.DARK_GRAY + " / " + ChatColor.GRAY + maxMb + ChatColor.DARK_GRAY + " MB";
++
 +        if ( isPlayer )
 +        {
-+            TextComponent memLine = component( BAR + label( "M\u00e9moire" ) + ARROW + memInline );
++            TextComponent memLine = component( memText );
 +            memLine.setHoverEvent( hover( buildMemoryDetail() ) );
 +            ( (Player) sender ).spigot().sendMessage( memLine );
 +        }
 +        else
 +        {
-+            sender.sendMessage( BAR + label( "M\u00e9moire" ) + ARROW + memInline );
++            sender.sendMessage( memText );
 +        }
 +
-+        // Players + Worlds on one line
 +        sender.sendMessage( BAR + label( "Joueurs" ) + ARROW
 +                + ChatColor.YELLOW + Bukkit.getOnlinePlayers().size() + ChatColor.DARK_GRAY + " / " + ChatColor.GRAY + Bukkit.getMaxPlayers()
 +                + ChatColor.DARK_GRAY + "    \u2503  " + ChatColor.GRAY + "Mondes " + ARROW
 +                + ChatColor.YELLOW + Bukkit.getWorlds().size() );
 +
-+        // Uptime
 +        sender.sendMessage( BAR + label( "Uptime" ) + ARROW + ChatColor.YELLOW + formatUptime() );
-+
-+        // Timings — op only
+ 
+-         for ( int i = 0; i < tps.length; i++) {
+-             tpsAvg[i] = format( tps[i] );
 +        if ( isOp )
 +        {
 +            if ( isPlayer )
@@ -115,8 +110,9 @@ index 21fd7ef..a33fccf 100644
 +            {
 +                sender.sendMessage( BAR + label( "Timings" ) + ARROW + plainTimingsLine() );
 +            }
-+        }
-+
+         }
+-        sender.sendMessage( ChatColor.GOLD + "TPS from last 1m, 5m, 15m: " + org.apache.commons.lang.StringUtils.join(tpsAvg, ", "));
+ 
 +        sender.sendMessage( "" );
          return true;
      }
@@ -139,15 +135,11 @@ index 21fd7ef..a33fccf 100644
 +        }
 +        line.addExtra( toggle );
 +        line.addExtra( new TextComponent( "  " ) );
-+
-+        TextComponent paste = clickable( ChatColor.YELLOW + "[\u2191 Exporter]", "/timings paste",
-+                ChatColor.GRAY + "Publier le rapport en ligne" );
-+        line.addExtra( paste );
++        line.addExtra( clickable( ChatColor.YELLOW + "[\u2191 Exporter]", "/timings paste",
++                ChatColor.GRAY + "Publier le rapport en ligne" ) );
 +        line.addExtra( new TextComponent( "  " ) );
-+
-+        TextComponent reset = clickable( ChatColor.GRAY + "[\u21BA Reset]", "/timings reset",
-+                ChatColor.GRAY + "Vider les compteurs" );
-+        line.addExtra( reset );
++        line.addExtra( clickable( ChatColor.GRAY + "[\u21BA Reset]", "/timings reset",
++                ChatColor.GRAY + "Vider les compteurs" ) );
 +
 +        return line;
 +    }
@@ -173,17 +165,21 @@ index 21fd7ef..a33fccf 100644
 +        return sb.toString();
 +    }
 +
-+    private static TextComponent component(String s) { return new TextComponent( TextComponent.fromLegacyText( s ) ); }
++    private static TextComponent component(String s)
++    {
++        TextComponent root = new TextComponent( "" );
++        for ( BaseComponent c : TextComponent.fromLegacyText( s ) ) root.addExtra( c );
++        return root;
++    }
 +
 +    private static HoverEvent hover(String text)
 +    {
-+        BaseComponent[] parts = new ComponentBuilder( "" ).append( TextComponent.fromLegacyText( text ) ).create();
-+        return new HoverEvent( HoverEvent.Action.SHOW_TEXT, parts );
++        return new HoverEvent( HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText( text ) );
 +    }
 +
 +    private static TextComponent clickable(String label, String command, String hoverText)
 +    {
-+        TextComponent c = new TextComponent( TextComponent.fromLegacyText( label ) );
++        TextComponent c = component( label );
 +        c.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, command ) );
 +        c.setHoverEvent( hover( hoverText ) );
 +        return c;
