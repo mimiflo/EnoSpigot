@@ -9,7 +9,7 @@ new file mode 100644
 index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000001
 --- /dev/null
 +++ b/src/main/java/com/hpfxd/pandaspigot/commands/KnockbackCommand.java
-@@ -0,0 +1,222 @@
+@@ -0,0 +1,223 @@
 +package com.hpfxd.pandaspigot.commands;
 +
 +import com.hpfxd.pandaspigot.config.PandaSpigotConfig;
