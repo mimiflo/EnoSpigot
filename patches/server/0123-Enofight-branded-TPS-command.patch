@@ -189,7 +189,7 @@ index 21fd7ef..5986d3b 100644
 +    {
 +        ChatColor[] colors = { ChatColor.DARK_GREEN, ChatColor.GREEN, ChatColor.YELLOW, ChatColor.GOLD, ChatColor.RED };
 +        int[] levels = { 20, 15, 10, 5, 1 };
-+        StringBuilder sb = new StringBuilder( ChatColor.GRAY + "" + ChatColor.BOLD + "Graphique TPS" + ChatColor.DARK_GRAY + "  (1m, 5m, 15m)\n\n" );
++        StringBuilder sb = new StringBuilder( ChatColor.GRAY + "Graphique TPS" + ChatColor.DARK_GRAY + "  (1m, 5m, 15m)\n\n" );
 +        for ( int row = 0; row < levels.length; row++ )
 +        {
 +            sb.append( colors[row] ).append( String.format( "%2d", levels[row] ) )
@@ -215,7 +215,7 @@ index 21fd7ef..5986d3b 100644
 +        long freeMb = maxMb - usedMb;
 +        long pct = maxMb > 0 ? ( usedMb * 100 / maxMb ) : 0;
 +        ChatColor c = colorFor( usedMb, maxMb );
-+        return ChatColor.GRAY + "" + ChatColor.BOLD + "M\u00e9moire JVM\n\n"
++        return ChatColor.GRAY + "M\u00e9moire JVM\n\n"
 +             + ChatColor.GRAY + "Utilis\u00e9e " + ARROW + c + usedMb + ChatColor.DARK_GRAY + " MB " + ChatColor.GRAY + "(" + c + pct + "%" + ChatColor.GRAY + ")\n"
 +             + ChatColor.GRAY + "Libre     " + ARROW + ChatColor.GREEN + freeMb + ChatColor.DARK_GRAY + " MB\n"
 +             + ChatColor.GRAY + "Allou\u00e9e  " + ARROW + ChatColor.YELLOW + totalMb + ChatColor.DARK_GRAY + " MB\n"

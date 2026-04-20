@@ -68,7 +68,7 @@ index c5a51d00b6d690213716b9bab71b4cfa8bf8af09..21c48d2b072ab4440d20a65d32945536
 +        if ("master".equals(gitBranch) || "main".equals(gitBranch)) {
 +            branchMsg = "";  // Don't show branch on main/master
 +        }
-+        return "This server is running EnoSpigot version " + getVersion() + " (API " + getBukkitVersion() + ") (Git: " + gitCommit + branchMsg + ")";
++        return "\n\u00A75\u00A7l  Enofight \u00A78/ \u00A77\u00A7oInformations\n\n\u00A78\u2503 \u00A77Version    \u00A78 \u00bb \u00A7e" + getVersion() + "\n\u00A78\u2503 \u00A77API        \u00A78 \u00bb \u00A7e" + getBukkitVersion() + "\n\u00A78\u2503 \u00A77Git        \u00A78 \u00bb \u00A7e" + gitCommit + branchMsg;
 +    }
 +    // PandaSpgiot end
  
