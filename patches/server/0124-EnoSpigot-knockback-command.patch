@@ -1,0 +1,251 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Enofight <team@enofight.com>
+Date: Sun, 20 Apr 2026 00:00:00 +0000
+Subject: [PATCH] EnoSpigot knockback command
+
+
+diff --git a/src/main/java/com/hpfxd/pandaspigot/commands/KnockbackCommand.java b/src/main/java/com/hpfxd/pandaspigot/commands/KnockbackCommand.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000001
+--- /dev/null
++++ b/src/main/java/com/hpfxd/pandaspigot/commands/KnockbackCommand.java
+@@ -0,0 +1,222 @@
++package com.hpfxd.pandaspigot.commands;
++
++import com.hpfxd.pandaspigot.config.PandaSpigotConfig;
++import com.hpfxd.pandaspigot.config.PandaSpigotWorldConfig;
++import com.hpfxd.configurate.eoyaml.EOYamlConfigurationLoader;
++import net.md_5.bungee.api.chat.BaseComponent;
++import net.md_5.bungee.api.chat.ClickEvent;
++import net.md_5.bungee.api.chat.HoverEvent;
++import net.md_5.bungee.api.chat.TextComponent;
++import org.bukkit.ChatColor;
++import org.bukkit.command.Command;
++import org.bukkit.command.CommandSender;
++import org.bukkit.entity.Player;
++import org.spongepowered.configurate.CommentedConfigurationNode;
++import org.spongepowered.configurate.objectmapping.ObjectMapper;
++import org.spongepowered.configurate.util.MapFactories;
++import org.spongepowered.configurate.util.NamingSchemes;
++
++import java.io.File;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.Collections;
++import java.util.List;
++
++public class KnockbackCommand extends Command
++{
++
++    private static final String[] PARAMS = {"friction", "horizontal", "vertical", "verticalLimit", "extraHorizontal", "extraVertical"};
++    private static final String[] LABELS = {"Friction       ", "Horizontal     ", "Vertical       ", "VerticalLimit  ", "ExtraHorizontal", "ExtraVertical  "};
++
++    public KnockbackCommand(String name)
++    {
++        super( name );
++        this.description = "View and modify knockback configuration";
++        this.usageMessage = "/kb [param] [value]";
++        this.setPermission( "enospigot.command.knockback" );
++        this.setAliases( Arrays.asList( "knockback" ) );
++    }
++
++    @Override
++    public boolean execute(CommandSender sender, String currentAlias, String[] args)
++    {
++        if ( !testPermission( sender ) )
++        {
++            return true;
++        }
++
++        String worldName = sender instanceof Player ? ( (Player) sender ).getWorld().getName() : "world";
++        PandaSpigotWorldConfig.KnockbackConfig kb = PandaSpigotConfig.getWorldConfig( worldName ).knockback;
++
++        if ( args.length == 0 )
++        {
++            displayKnockback( sender, kb );
++            return true;
++        }
++
++        if ( args[0].equalsIgnoreCase( "save" ) )
++        {
++            saveConfig( kb );
++            sender.sendMessage( ChatColor.GREEN + "Knockback sauvegard\u00e9 dans pandaspigot.yml" );
++            return true;
++        }
++
++        if ( args[0].equalsIgnoreCase( "reset" ) )
++        {
++            PandaSpigotWorldConfig.KnockbackConfig defaults = new PandaSpigotWorldConfig.KnockbackConfig();
++            kb.friction = defaults.friction;
++            kb.horizontal = defaults.horizontal;
++            kb.vertical = defaults.vertical;
++            kb.verticalLimit = defaults.verticalLimit;
++            kb.extraHorizontal = defaults.extraHorizontal;
++            kb.extraVertical = defaults.extraVertical;
++            sender.sendMessage( ChatColor.GREEN + "Knockback r\u00e9initialis\u00e9." );
++            displayKnockback( sender, kb );
++            return true;
++        }
++
++        if ( args.length < 2 )
++        {
++            sender.sendMessage( ChatColor.RED + "Usage: /kb <param> <value>" );
++            return true;
++        }
++
++        String param = args[0].toLowerCase();
++        double value;
++        try
++        {
++            value = Double.parseDouble( args[1] );
++        } catch ( NumberFormatException e )
++        {
++            sender.sendMessage( ChatColor.RED + "Valeur invalide: " + args[1] );
++            return true;
++        }
++
++        boolean found = true;
++        switch ( param )
++        {
++            case "friction":        kb.friction = value; break;
++            case "horizontal":      kb.horizontal = value; break;
++            case "vertical":        kb.vertical = value; break;
++            case "verticallimit":   kb.verticalLimit = value; break;
++            case "extrahorizontal": kb.extraHorizontal = value; break;
++            case "extravertical":   kb.extraVertical = value; break;
++            default: found = false;
++        }
++
++        if ( !found )
++        {
++            sender.sendMessage( ChatColor.RED + "Param\u00e8tre inconnu: " + args[0] );
++            return true;
++        }
++
++        sender.sendMessage( ChatColor.DARK_GRAY + "\u2503 " + ChatColor.GRAY + args[0] + ChatColor.DARK_GRAY + " \u00bb " + ChatColor.YELLOW + fmtVal( value ) );
++        return true;
++    }
++
++    private void displayKnockback(CommandSender sender, PandaSpigotWorldConfig.KnockbackConfig kb)
++    {
++        double[] values = { kb.friction, kb.horizontal, kb.vertical, kb.verticalLimit, kb.extraHorizontal, kb.extraVertical };
++
++        String header = "\n" + ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "  Enofight " + ChatColor.DARK_GRAY + "/ " + ChatColor.GRAY + "" + ChatColor.ITALIC + "Knockback";
++        sender.sendMessage( header );
++        sender.sendMessage( " " );
++
++        boolean isPlayer = sender instanceof Player;
++
++        for ( int i = 0; i < PARAMS.length; i++ )
++        {
++            String line = ChatColor.DARK_GRAY + "\u2503 " + ChatColor.GRAY + LABELS[i] + ChatColor.DARK_GRAY + " \u00bb " + ChatColor.YELLOW + fmtVal( values[i] );
++
++            if ( isPlayer )
++            {
++                Player p = (Player) sender;
++                TextComponent root = component( line + "  " );
++                root.addExtra( clickable( ChatColor.RED + "[-]", "/kb " + PARAMS[i] + " " + fmtVal( values[i] - 0.1 ), "- 0.1" ) );
++                root.addExtra( clickable( " " + ChatColor.GREEN + "[+]", "/kb " + PARAMS[i] + " " + fmtVal( values[i] + 0.1 ), "+ 0.1" ) );
++                p.spigot().sendMessage( root );
++            } else
++            {
++                sender.sendMessage( line );
++            }
++        }
++
++        sender.sendMessage( " " );
++
++        if ( isPlayer )
++        {
++            Player p = (Player) sender;
++            TextComponent actions = new TextComponent( "" );
++            actions.addExtra( clickable( ChatColor.DARK_GRAY + "[" + ChatColor.GREEN + "Sauvegarder" + ChatColor.DARK_GRAY + "]", "/kb save", "Sauvegarder dans pandaspigot.yml" ) );
++            actions.addExtra( clickable( " " + ChatColor.DARK_GRAY + "[" + ChatColor.RED + "R\u00e9initialiser" + ChatColor.DARK_GRAY + "]", "/kb reset", "Valeurs par d\u00e9faut" ) );
++            p.spigot().sendMessage( actions );
++        }
++    }
++
++    private static void saveConfig(PandaSpigotWorldConfig.KnockbackConfig kb)
++    {
++        try
++        {
++            File file = new File( "pandaspigot.yml" );
++            EOYamlConfigurationLoader loader = EOYamlConfigurationLoader.builder()
++                    .file( file )
++                    .defaultOptions( o -> o
++                            .mapFactory( MapFactories.insertionOrdered() )
++                            .serializers( build -> build.registerAnnotatedObjects( ObjectMapper.factoryBuilder()
++                                    .defaultNamingScheme( NamingSchemes.CAMEL_CASE )
++                                    .build() ) ) )
++                    .build();
++            CommentedConfigurationNode root = loader.load();
++            CommentedConfigurationNode kbNode = root.node( "worlds", "default", "knockback" );
++            kbNode.node( "friction" ).set( kb.friction );
++            kbNode.node( "horizontal" ).set( kb.horizontal );
++            kbNode.node( "vertical" ).set( kb.vertical );
++            kbNode.node( "verticalLimit" ).set( kb.verticalLimit );
++            kbNode.node( "extraHorizontal" ).set( kb.extraHorizontal );
++            kbNode.node( "extraVertical" ).set( kb.extraVertical );
++            loader.save( root );
++        } catch ( Exception e )
++        {
++            e.printStackTrace();
++        }
++    }
++
++    private static TextComponent component(String s)
++    {
++        TextComponent root = new TextComponent( "" );
++        for ( BaseComponent c : TextComponent.fromLegacyText( s ) ) root.addExtra( c );
++        return root;
++    }
++
++    private static TextComponent clickable(String label, String command, String hover)
++    {
++        TextComponent c = component( label );
++        c.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, command ) );
++        c.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText( ChatColor.GRAY + hover ) ) );
++        return c;
++    }
++
++    private static String fmtVal(double v)
++    {
++        return String.valueOf( Math.round( v * 1000.0 ) / 1000.0 );
++    }
++
++    @Override
++    public List<String> tabComplete(CommandSender sender, String alias, String[] args)
++    {
++        if ( !testPermissionSilent( sender ) ) return Collections.emptyList();
++        if ( args.length == 1 )
++        {
++            List<String> completions = new ArrayList<>();
++            String input = args[0].toLowerCase();
++            for ( String param : PARAMS )
++            {
++                if ( param.toLowerCase().startsWith( input ) ) completions.add( param );
++            }
++            if ( "save".startsWith( input ) ) completions.add( "save" );
++            if ( "reset".startsWith( input ) ) completions.add( "reset" );
++            return completions;
++        }
++        return Collections.emptyList();
++    }
++}
+diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/spigotmc/SpigotConfig.java
+index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000001 100644
+--- a/src/main/java/org/spigotmc/SpigotConfig.java
++++ b/src/main/java/org/spigotmc/SpigotConfig.java
+@@ -266,4 +266,11 @@ public class SpigotConfig
+     {
+         commands.put( "tps", new TicksPerSecondCommand( "tps" ) );
+     }
++
++    // EnoSpigot start - Knockback command
++    private static void knockbackCommand()
++    {
++        commands.put( "kb", new com.hpfxd.pandaspigot.commands.KnockbackCommand( "kb" ) );
++    }
++    // EnoSpigot end
+
+     public static int playerSample;
