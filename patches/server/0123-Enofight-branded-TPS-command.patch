@@ -5,30 +5,202 @@ Subject: [PATCH] Enofight branded TPS command
 
 
 diff --git a/src/main/java/org/spigotmc/TicksPerSecondCommand.java b/src/main/java/org/spigotmc/TicksPerSecondCommand.java
-index 21fd7ef..abbd42c 100644
+index 21fd7ef..834ea82 100644
 --- a/src/main/java/org/spigotmc/TicksPerSecondCommand.java
 +++ b/src/main/java/org/spigotmc/TicksPerSecondCommand.java
-@@ -23,14 +23,21 @@ public class TicksPerSecondCommand extends Command
+@@ -1,8 +1,20 @@
+ package org.spigotmc;
+ 
++import org.bukkit.Bukkit;
+ import org.bukkit.ChatColor;
+ import org.bukkit.command.Command;
+ import org.bukkit.command.CommandSender;
++import org.bukkit.entity.Player;
++
++// EnoSpigot start - rich /tps command
++import net.md_5.bungee.api.chat.ClickEvent;
++import net.md_5.bungee.api.chat.ComponentBuilder;
++import net.md_5.bungee.api.chat.HoverEvent;
++import net.md_5.bungee.api.chat.TextComponent;
++import java.lang.management.ManagementFactory;
++import java.util.Arrays;
++import java.util.concurrent.TimeUnit;
++// EnoSpigot end
+ 
+ public class TicksPerSecondCommand extends Command
+ {
+@@ -13,6 +25,7 @@ public class TicksPerSecondCommand extends Command
+         this.description = "Gets the current ticks per second for the server";
+         this.usageMessage = "/tps";
+         this.setPermission( "bukkit.command.tps" );
++        this.setAliases( Arrays.asList( "lag" ) ); // EnoSpigot - /lag alias
+     }
+ 
+     @Override
+@@ -23,18 +36,157 @@ public class TicksPerSecondCommand extends Command
              return true;
          }
-
+ 
 -        // PaperSpigot start - Further improve tick handling
-+        // EnoSpigot - branded performance command
-         double[] tps = org.bukkit.Bukkit.spigot().getTPS();
-         String[] tpsAvg = new String[tps.length];
-
-          for ( int i = 0; i < tps.length; i++) {
-              tpsAvg[i] = format( tps[i] );
+-        double[] tps = org.bukkit.Bukkit.spigot().getTPS();
+-        String[] tpsAvg = new String[tps.length];
++        // EnoSpigot start - rich /tps with graph, hover and click events
++        double[] tps = Bukkit.spigot().getTPS();
++        boolean isPlayer = sender instanceof Player;
++        boolean isOp = sender.isOp();
++
++        String header = ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "--*-----------------" + ChatColor.RESET + " " + ChatColor.DARK_PURPLE + ChatColor.BOLD + "Enofight" + ChatColor.RESET + " " + ChatColor.DARK_GRAY + ChatColor.STRIKETHROUGH + "-----------------*--";
++        String footer = ChatColor.DARK_GRAY + "" + ChatColor.STRIKETHROUGH + "--*-------------------------------------------*--";
++
++        String serverName;
++        try { serverName = Bukkit.getServerName(); } catch ( Throwable t ) { serverName = "Enofight"; }
++        String serverLine = ChatColor.GRAY + "Serveur " + ChatColor.DARK_GRAY + "\u25b8 " + ChatColor.YELLOW + serverName;
++        String uptimeLine = ChatColor.GRAY + "Uptime  " + ChatColor.DARK_GRAY + "\u25b8 " + ChatColor.YELLOW + formatUptime();
++        String tpsLine = ChatColor.GRAY + "TPS     " + ChatColor.DARK_GRAY + "(1m, 5m, 15m) \u25b8 " + format( tps[0] ) + ChatColor.DARK_GRAY + ", " + format( tps[1] ) + ChatColor.DARK_GRAY + ", " + format( tps[2] );
++        String graph = buildGraph( tps );
++        String memInfo = buildMemoryInfo();
++        String serverInfo = buildServerInfo();
++
++        if ( isPlayer )
++        {
++            Player p = (Player) sender;
++            p.sendMessage( header );
++            p.sendMessage( serverLine );
++            p.sendMessage( uptimeLine );
++
++            TextComponent tpsComp = new TextComponent( tpsLine + "  " );
++            TextComponent graphLink = new TextComponent( ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + "graph" + ChatColor.DARK_GRAY + "]" );
++            graphLink.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder( graph ).create() ) );
++            tpsComp.addExtra( graphLink );
++            p.spigot().sendMessage( tpsComp );
++
++            TextComponent memComp = new TextComponent( ChatColor.GRAY + "M\u00e9moire " + ChatColor.DARK_GRAY + "\u25b8 " + summarizeMemory() + "  " );
++            TextComponent memHover = new TextComponent( ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + "info" + ChatColor.DARK_GRAY + "]" );
++            memHover.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder( memInfo ).create() ) );
++            memComp.addExtra( memHover );
++            p.spigot().sendMessage( memComp );
++
++            TextComponent srvComp = new TextComponent( ChatColor.GRAY + "Serveur " + ChatColor.DARK_GRAY + "\u25b8 " + summarizeServer() + "  " );
++            TextComponent srvHover = new TextComponent( ChatColor.DARK_GRAY + "[" + ChatColor.YELLOW + "info" + ChatColor.DARK_GRAY + "]" );
++            srvHover.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder( serverInfo ).create() ) );
++            srvComp.addExtra( srvHover );
++            p.spigot().sendMessage( srvComp );
++
++            if ( isOp )
++            {
++                TextComponent timings = new TextComponent( ChatColor.GRAY + "Timings " + ChatColor.DARK_GRAY + "\u25b8 " );
++                TextComponent on = clickable( ChatColor.GREEN + "[on]", "/timings on", "Activer les timings" );
++                TextComponent paste = clickable( " " + ChatColor.YELLOW + "[paste]", "/timings paste", "Exporter le rapport" );
++                TextComponent reset = clickable( " " + ChatColor.RED + "[reset]", "/timings reset", "R\u00e9initialiser" );
++                timings.addExtra( on );
++                timings.addExtra( paste );
++                timings.addExtra( reset );
++                p.spigot().sendMessage( timings );
++            }
+ 
+-         for ( int i = 0; i < tps.length; i++) {
+-             tpsAvg[i] = format( tps[i] );
++            p.sendMessage( footer );
          }
 -        sender.sendMessage( ChatColor.GOLD + "TPS from last 1m, 5m, 15m: " + org.apache.commons.lang.StringUtils.join(tpsAvg, ", "));
-+        sender.sendMessage( "" + ChatColor.DARK_PURPLE + ChatColor.BOLD + "Enofight " + ChatColor.DARK_GRAY + "\u2014 " + ChatColor.GRAY + "TPS (1m, 5m, 15m): " + org.apache.commons.lang.StringUtils.join(tpsAvg, ChatColor.DARK_GRAY + ", "));
-+
-+        Runtime runtime = Runtime.getRuntime();
-+        long usedMb = (runtime.totalMemory() - runtime.freeMemory()) / 1048576L;
-+        long maxMb = runtime.maxMemory() / 1048576L;
-+        ChatColor memColor = usedMb < maxMb * 7 / 10 ? ChatColor.GREEN : usedMb < maxMb * 9 / 10 ? ChatColor.YELLOW : ChatColor.RED;
-+        sender.sendMessage( ChatColor.DARK_GRAY + " \u25CF " + ChatColor.GRAY + "M\u00e9moire " + ChatColor.DARK_GRAY + "\u25b8 " + memColor + usedMb + ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + maxMb + ChatColor.DARK_GRAY + " MB");
++        else
++        {
++            sender.sendMessage( header );
++            sender.sendMessage( serverLine );
++            sender.sendMessage( uptimeLine );
++            sender.sendMessage( tpsLine );
++            for ( String line : graph.split( "\n" ) ) sender.sendMessage( line );
++            for ( String line : memInfo.split( "\n" ) ) sender.sendMessage( line );
++            for ( String line : serverInfo.split( "\n" ) ) sender.sendMessage( line );
++            sender.sendMessage( footer );
++        }
 +        // EnoSpigot end
-
+ 
          return true;
      }
+ 
++    // EnoSpigot start - helpers
++    private static TextComponent clickable(String label, String command, String hover)
++    {
++        TextComponent c = new TextComponent( label );
++        c.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, command ) );
++        c.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder( ChatColor.GRAY + hover ).create() ) );
++        return c;
++    }
++
++    private static String buildGraph(double[] tps)
++    {
++        ChatColor[] colors = { ChatColor.DARK_GREEN, ChatColor.GREEN, ChatColor.YELLOW, ChatColor.GOLD, ChatColor.RED };
++        double[] levels = { 20.0, 15.0, 10.0, 5.0, 0.1 };
++        StringBuilder sb = new StringBuilder();
++        for ( int row = 0; row < levels.length; row++ )
++        {
++            sb.append( colors[row] ).append( (int) levels[row] ).append( ChatColor.DARK_GRAY ).append( " \u2502 " );
++            for ( int i = 0; i < tps.length; i++ )
++            {
++                double t = Math.min( tps[i], 20.0 );
++                if ( t >= levels[row] ) sb.append( colors[row] ).append( "\u2588" );
++                else sb.append( ChatColor.DARK_GRAY ).append( "\u2591" );
++            }
++            if ( row < levels.length - 1 ) sb.append( "\n" );
++        }
++        return sb.toString();
++    }
++
++    private static String formatUptime()
++    {
++        long ms = ManagementFactory.getRuntimeMXBean().getUptime();
++        long days = TimeUnit.MILLISECONDS.toDays( ms );
++        long hours = TimeUnit.MILLISECONDS.toHours( ms ) % 24;
++        long minutes = TimeUnit.MILLISECONDS.toMinutes( ms ) % 60;
++        long seconds = TimeUnit.MILLISECONDS.toSeconds( ms ) % 60;
++        StringBuilder sb = new StringBuilder();
++        if ( days > 0 ) sb.append( days ).append( "j " );
++        if ( hours > 0 ) sb.append( hours ).append( "h " );
++        if ( minutes > 0 ) sb.append( minutes ).append( "m " );
++        sb.append( seconds ).append( "s" );
++        return sb.toString();
++    }
++
++    private static String summarizeMemory()
++    {
++        Runtime rt = Runtime.getRuntime();
++        long usedMb = ( rt.totalMemory() - rt.freeMemory() ) / 1048576L;
++        long maxMb = rt.maxMemory() / 1048576L;
++        ChatColor c = usedMb < maxMb * 7 / 10 ? ChatColor.GREEN : usedMb < maxMb * 9 / 10 ? ChatColor.YELLOW : ChatColor.RED;
++        return c + "" + usedMb + ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + maxMb + ChatColor.DARK_GRAY + " MB";
++    }
++
++    private static String summarizeServer()
++    {
++        return ChatColor.YELLOW + "" + Bukkit.getOnlinePlayers().size() + ChatColor.DARK_GRAY + "/" + ChatColor.GRAY + Bukkit.getMaxPlayers() + ChatColor.DARK_GRAY + " joueurs";
++    }
++
++    private static String buildMemoryInfo()
++    {
++        Runtime rt = Runtime.getRuntime();
++        long usedMb = ( rt.totalMemory() - rt.freeMemory() ) / 1048576L;
++        long totalMb = rt.totalMemory() / 1048576L;
++        long maxMb = rt.maxMemory() / 1048576L;
++        long freeMb = maxMb - usedMb;
++        ChatColor c = usedMb < maxMb * 7 / 10 ? ChatColor.GREEN : usedMb < maxMb * 9 / 10 ? ChatColor.YELLOW : ChatColor.RED;
++        return ChatColor.GRAY + "Utilis\u00e9e " + ChatColor.DARK_GRAY + "\u25b8 " + c + usedMb + ChatColor.DARK_GRAY + " / " + ChatColor.GRAY + maxMb + ChatColor.DARK_GRAY + " MB\n"
++             + ChatColor.GRAY + "Libre    " + ChatColor.DARK_GRAY + "\u25b8 " + ChatColor.GREEN + freeMb + ChatColor.DARK_GRAY + " MB\n"
++             + ChatColor.GRAY + "Allou\u00e9e " + ChatColor.DARK_GRAY + "\u25b8 " + ChatColor.YELLOW + totalMb + ChatColor.DARK_GRAY + " MB";
++    }
++
++    private static String buildServerInfo()
++    {
++        return ChatColor.GRAY + "Joueurs " + ChatColor.DARK_GRAY + "\u25b8 " + ChatColor.YELLOW + Bukkit.getOnlinePlayers().size() + ChatColor.DARK_GRAY + " / " + ChatColor.GRAY + Bukkit.getMaxPlayers() + "\n"
++             + ChatColor.GRAY + "Mondes  " + ChatColor.DARK_GRAY + "\u25b8 " + ChatColor.YELLOW + Bukkit.getWorlds().size() + "\n"
++             + ChatColor.GRAY + "Version " + ChatColor.DARK_GRAY + "\u25b8 " + ChatColor.YELLOW + Bukkit.getVersion() + "\n"
++             + ChatColor.GRAY + "Bukkit  " + ChatColor.DARK_GRAY + "\u25b8 " + ChatColor.YELLOW + Bukkit.getBukkitVersion();
++    }
++    // EnoSpigot end
++
+     private static String format(double tps) // PaperSpigot - made static
+     {
+         return ( ( tps > 18.0 ) ? ChatColor.GREEN : ( tps > 16.0 ) ? ChatColor.YELLOW : ChatColor.RED ).toString()
+-- 
+2.43.0
+
