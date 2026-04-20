@@ -1,0 +1,86 @@
+
+Welcome to Gradle 9.4.1!
+
+Here are the highlights of this release:
+ - Java 26 support
+ - Non-class-based JVM tests
+ - Enhanced console progress bar
+
+For more details see https://docs.gradle.org/9.4.1/release-notes.html
+
+Starting a Gradle Daemon (subsequent builds will be faster)
+> Task :build-logic:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-logic:generateExternalPluginSpecBuilders FROM-CACHE
+> Task :build-logic:extractPrecompiledScriptPluginPlugins FROM-CACHE
+> Task :build-logic:compilePluginsBlocks FROM-CACHE
+> Task :build-logic:generatePrecompiledScriptPluginAccessors FROM-CACHE
+> Task :build-logic:generateScriptPluginAdapters FROM-CACHE
+> Task :build-logic:compileKotlin FROM-CACHE
+> Task :build-logic:compileJava NO-SOURCE
+> Task :build-logic:pluginDescriptors
+> Task :build-logic:processResources
+> Task :build-logic:classes
+> Task :build-logic:jar
+> Task :enospigot-server:processResources
+> Task :enospigot-server:prepareTestServerDir
+> Task :enospigot-server:processTestResources NO-SOURCE
+> Task :paperclip:compileJava FROM-CACHE
+> Task :paperclip:processResources NO-SOURCE
+> Task :paperclip:classes UP-TO-DATE
+> Task :paperclip:jar
+> Task :paperclip:compileJava9Java FROM-CACHE
+> Task :paperclip:processJava9Resources NO-SOURCE
+> Task :paperclip:java9Classes UP-TO-DATE
+> Task :paperclip:shadowJar
+> Task :paperclip:assemble
+> Task :paperclip:compileTestJava NO-SOURCE
+> Task :paperclip:prepareTestServerDir
+> Task :paperclip:processTestResources NO-SOURCE
+> Task :paperclip:testClasses UP-TO-DATE
+> Task :paperclip:test NO-SOURCE
+> Task :paperclip:check UP-TO-DATE
+> Task :paperclip:build
+
+> Task :enospigot-api:compileJava
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :enospigot-api:processResources NO-SOURCE
+> Task :enospigot-api:classes
+> Task :enospigot-api:generateApiVersioningFile
+> Task :enospigot-api:jar
+
+> Task :enospigot-server:compileJava
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/com/hpfxd/pandaspigot/commands/KnockbackCommand.java:222: error: reached end of file while parsing
+    }
+     ^
+1 error
+
+> Task :enospigot-server:compileJava FAILED
+
+> Task :enospigot-api:javadoc
+/home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-API/src/main/java/org/bukkit/material/Door.java:14: warning: Tag @see: reference not found: Material.WOODEN_DOOR
+ * @see Material.WOODEN_DOOR
+   ^
+1 warning
+
+[Incubating] Problems report is available at: file:///home/runner/work/EnoSpigot/EnoSpigot/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':enospigot-server:compileJava'.
+> Compilation failed; see the compiler output below.
+  /home/runner/work/EnoSpigot/EnoSpigot/EnoSpigot-Server/src/main/java/com/hpfxd/pandaspigot/commands/KnockbackCommand.java:222: error: reached end of file while parsing
+      }
+       ^
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 26s
+21 actionable tasks: 13 executed, 8 from cache
