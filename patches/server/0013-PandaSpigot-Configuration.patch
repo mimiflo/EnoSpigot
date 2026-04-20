@@ -77,7 +77,7 @@ index 0000000000000000000000000000000000000000..f021fd0c7622a788b809ecbf89616291
 +        EOYamlConfigurationLoader loader = EOYamlConfigurationLoader.builder()
 +                .file(file)
 +                .defaultOptions(o -> o
-+                        .header("This is the configuration file for PandaSpigot.\n" +
++                        .header("This is the configuration file for EnoSpigot.\n" +
 +                                "Use caution when modifying settings, as some may impact gameplay in non-obvious ways.")
 +                        .mapFactory(MapFactories.insertionOrdered())
 +                        .serializers(build -> build.registerAnnotatedObjects(ObjectMapper.factoryBuilder()
@@ -219,7 +219,7 @@ index 3add8302c4817ed2612c55f2213db67d139e2a46..d8bb9c3e95b14e91075f8a36053e4409
 +                acceptsAll(asList("pandaspigot-settings"), "File for PandaSpigot settings")
 +                        .withRequiredArg()
 +                        .ofType(File.class)
-+                        .defaultsTo(new File("pandaspigot.yml"))
++                        .defaultsTo(new File("enospigot.yml"))
 +                        .describedAs("Yml file");
 +                // PandaSpigot end
              }

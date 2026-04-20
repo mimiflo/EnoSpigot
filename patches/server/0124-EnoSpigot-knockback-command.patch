@@ -69,7 +69,7 @@ index 0000000000000000000000000000000000000000..00000000000000000000000000000000
 +        if ( args[0].equalsIgnoreCase( "save" ) )
 +        {
 +            saveConfig( kb );
-+            sender.sendMessage( ChatColor.GREEN + "Knockback sauvegard\u00e9 dans pandaspigot.yml" );
++            sender.sendMessage( ChatColor.GREEN + "Knockback sauvegard\u00e9 dans enospigot.yml" );
 +            return true;
 +        }
 +
@@ -159,7 +159,7 @@ index 0000000000000000000000000000000000000000..00000000000000000000000000000000
 +        {
 +            Player p = (Player) sender;
 +            TextComponent actions = new TextComponent( "" );
-+            actions.addExtra( clickable( ChatColor.DARK_GRAY + "[" + ChatColor.GREEN + "Sauvegarder" + ChatColor.DARK_GRAY + "]", "/kb save", "Sauvegarder dans pandaspigot.yml" ) );
++            actions.addExtra( clickable( ChatColor.DARK_GRAY + "[" + ChatColor.GREEN + "Sauvegarder" + ChatColor.DARK_GRAY + "]", "/kb save", "Sauvegarder dans enospigot.yml" ) );
 +            actions.addExtra( clickable( " " + ChatColor.DARK_GRAY + "[" + ChatColor.RED + "R\u00e9initialiser" + ChatColor.DARK_GRAY + "]", "/kb reset", "Valeurs par d\u00e9faut" ) );
 +            p.spigot().sendMessage( actions );
 +            p.sendMessage( " " );
@@ -170,7 +170,7 @@ index 0000000000000000000000000000000000000000..00000000000000000000000000000000
 +    {
 +        try
 +        {
-+            File file = new File( "pandaspigot.yml" );
++            File file = new File( "enospigot.yml" );
 +            EOYamlConfigurationLoader loader = EOYamlConfigurationLoader.builder()
 +                    .file( file )
 +                    .defaultOptions( o -> o

@@ -93,12 +93,12 @@ index 0000000000000000000000000000000000000000..24d213655f038129e25bd75ce876ba68
 +                    try {
 +                        clazz = Class.forName("net.minecraft.server." + key);
 +                    } catch (ClassNotFoundException e) {
-+                        Bukkit.getLogger().warning("Packet '" + key + "' does not exist, cannot limit it! Please update pandaspigot.yml");
++                        Bukkit.getLogger().warning("Packet '" + key + "' does not exist, cannot limit it! Please update enospigot.yml");
 +                        continue;
 +                    }
 +
 +                    if (!Packet.class.isAssignableFrom(clazz)) {
-+                        Bukkit.getLogger().warning("Class '" + key + "' is not a packet, cannot limit it! Please update pandaspigot.yml");
++                        Bukkit.getLogger().warning("Class '" + key + "' is not a packet, cannot limit it! Please update enospigot.yml");
 +                        continue;
 +                    }
 +

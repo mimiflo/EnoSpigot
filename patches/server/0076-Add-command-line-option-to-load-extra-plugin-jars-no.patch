@@ -80,7 +80,7 @@ index f842cb9505fcb93ad36ae925a65c245cfb674d1d..335727493ab37e8aa235936b12af0cce
 +++ b/src/main/java/org/bukkit/craftbukkit/Main.java
 @@ -139,6 +139,11 @@ public class Main {
                          .ofType(File.class)
-                         .defaultsTo(new File("pandaspigot.yml"))
+                         .defaultsTo(new File("enospigot.yml"))
                          .describedAs("Yml file");
 +
 +                acceptsAll(asList("add-plugin", "add-extra-plugin-jar"), "Specify paths to extra plugin jars to be loaded in addition to those in the plugins folder. This argument can be specified multiple times, once for each extra plugin jar path.")
