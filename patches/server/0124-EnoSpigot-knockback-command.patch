@@ -162,6 +162,7 @@ index 0000000000000000000000000000000000000000..00000000000000000000000000000000
 +            actions.addExtra( clickable( ChatColor.DARK_GRAY + "[" + ChatColor.GREEN + "Sauvegarder" + ChatColor.DARK_GRAY + "]", "/kb save", "Sauvegarder dans pandaspigot.yml" ) );
 +            actions.addExtra( clickable( " " + ChatColor.DARK_GRAY + "[" + ChatColor.RED + "R\u00e9initialiser" + ChatColor.DARK_GRAY + "]", "/kb reset", "Valeurs par d\u00e9faut" ) );
 +            p.spigot().sendMessage( actions );
++            p.sendMessage( " " );
 +        }
 +    }
 +
