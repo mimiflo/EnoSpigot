@@ -11,3 +11,6 @@ run/
 build/
 
 paperclip.jar
+
+# local dev tooling (knowledge graph)
+graphify-out/
