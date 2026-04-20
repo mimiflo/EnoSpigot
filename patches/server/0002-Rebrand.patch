@@ -13,7 +13,7 @@ index 864b3bc1375cb72588b63855eee8fa4ff569a5d3..7d19ec833d61c2f75b5eb75d7eb291c7
  
      public String getServerModName() {
 -        return "PaperSpigot"; // PaperSpigot - PaperSpigot > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
-+        return "PandaSpigot"; // PandaSpigot - PandaSpigot > // PaperSpigot - PaperSpigot > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
++        return "EnoSpigot"; // EnoSpigot - EnoSpigot > // PaperSpigot - PaperSpigot > // Spigot - Spigot > // CraftBukkit - cb > vanilla!
      }
  
      public CrashReport b(CrashReport crashreport) {
@@ -26,7 +26,7 @@ index 69485fa696f27c965dd576d9cda7b4b56ef57032..ad8c5da90fc64825185aedcfdf89a6ff
  public final class CraftServer implements Server {
      private static final Player[] EMPTY_PLAYER_ARRAY = new Player[0];
 -    private final String serverName = "CraftBukkit";
-+    private final String serverName = "PandaSpigot"; // PandaSpigot
++    private final String serverName = "EnoSpigot"; // EnoSpigot
      private final String serverVersion;
      private final String bukkitVersion = Versioning.getBukkitVersion();
      private final Logger logger = Logger.getLogger("Minecraft");
@@ -52,7 +52,7 @@ index c8f619a7eddd0fbfe10e13164c946b50734e3100..879e29592d9f6c4be7bd5d5dfbf83be1
      private WatchdogThread(long timeoutTime, boolean restart)
      {
 -        super( "PaperSpigot Watchdog Thread" );
-+        super( "PandaSpigot Watchdog Thread" ); // PandaSpigot
++        super( "EnoSpigot Watchdog Thread" ); // EnoSpigot
          this.timeoutTime = timeoutTime;
          this.restart = restart;
      }
@@ -61,10 +61,10 @@ index c8f619a7eddd0fbfe10e13164c946b50734e3100..879e29592d9f6c4be7bd5d5dfbf83be1
                  Logger log = Bukkit.getServer().getLogger();
                  log.log( Level.SEVERE, "The server has stopped responding!" );
 -                log.log( Level.SEVERE, "Please report this to PaperSpigot directly!" );
-+                log.log( Level.SEVERE, "Please report this in https://github.com/hpfxd/PandaSpigot/issues!" ); // PandaSpigot
++                log.log( Level.SEVERE, "Please report this to the Enofight team!" ); // EnoSpigot
                  log.log( Level.SEVERE, "Be sure to include ALL relevant console errors and Minecraft crash reports" );
 -                log.log( Level.SEVERE, "PaperSpigot version: " + Bukkit.getServer().getVersion() );
-+                log.log( Level.SEVERE, "PandaSpigot version: " + Bukkit.getServer().getVersion() ); // PandaSpigot
++                log.log( Level.SEVERE, "EnoSpigot version: " + Bukkit.getServer().getVersion() ); // EnoSpigot
                  //
                  if(net.minecraft.server.World.haveWeSilencedAPhysicsCrash)
                  {
@@ -73,7 +73,7 @@ index c8f619a7eddd0fbfe10e13164c946b50734e3100..879e29592d9f6c4be7bd5d5dfbf83be1
                  //
                  log.log( Level.SEVERE, "------------------------------" );
 -                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to PaperSpigot!):" );
-+                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to PandaSpigot!):" ); // PandaSpigot
++                log.log( Level.SEVERE, "Server thread dump (Look for plugins here before reporting to Enofight!):" ); // EnoSpigot
                  dumpThread( ManagementFactory.getThreadMXBean().getThreadInfo( MinecraftServer.getServer().primaryThread.getId(), Integer.MAX_VALUE ), log );
                  log.log( Level.SEVERE, "------------------------------" );
                  //

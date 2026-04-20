@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Enofight <team@enofight.com>
+Date: Sun, 20 Apr 2026 00:00:00 +0000
+Subject: [PATCH] Enofight branded TPS command
+
+
+diff --git a/src/main/java/org/spigotmc/TicksPerSecondCommand.java b/src/main/java/org/spigotmc/TicksPerSecondCommand.java
+index 21fd7ef..000000a 100644
+--- a/src/main/java/org/spigotmc/TicksPerSecondCommand.java
++++ b/src/main/java/org/spigotmc/TicksPerSecondCommand.java
+@@ -1,5 +1,6 @@
+ package org.spigotmc;
+
++import net.minecraft.server.MinecraftServer; // EnoSpigot
+ import org.bukkit.ChatColor;
+ import org.bukkit.command.Command;
+ import org.bukkit.command.CommandSender;
+@@ -23,12 +24,25 @@ public class TicksPerSecondCommand extends Command
+             return true;
+         }
+
+-        // PaperSpigot start - Further improve tick handling
++        // EnoSpigot start - branded TPS output
+         double[] tps = org.bukkit.Bukkit.spigot().getTPS();
+         String[] tpsAvg = new String[tps.length];
+-
+          for ( int i = 0; i < tps.length; i++) {
+              tpsAvg[i] = format( tps[i] );
+         }
+-        sender.sendMessage( ChatColor.GOLD + "TPS from last 1m, 5m, 15m: " + org.apache.commons.lang.StringUtils.join(tpsAvg, ", "));
++
++        sender.sendMessage( "" + ChatColor.DARK_PURPLE + ChatColor.BOLD + "Enofight"
++                + ChatColor.DARK_GRAY + " \u2014 " + ChatColor.GRAY + "Performance" );
++        sender.sendMessage( ChatColor.DARK_GRAY + " \u25CF " + ChatColor.GRAY + "TPS "
++                + ChatColor.DARK_GRAY + "(" + ChatColor.GRAY + "1m" + ChatColor.DARK_GRAY + ", "
++                + ChatColor.GRAY + "5m" + ChatColor.DARK_GRAY + ", " + ChatColor.GRAY + "15m"
++                + ChatColor.DARK_GRAY + "): " + org.apache.commons.lang.StringUtils.join(tpsAvg, ChatColor.DARK_GRAY + ", "));
++
++        Runtime runtime = Runtime.getRuntime();
++        long usedMb = (runtime.totalMemory() - runtime.freeMemory()) / 1048576;
++        long maxMb = runtime.maxMemory() / 1048576;
++        ChatColor memColor = usedMb < maxMb * 0.7 ? ChatColor.GREEN : usedMb < maxMb * 0.9 ? ChatColor.YELLOW : ChatColor.RED;
++        sender.sendMessage( ChatColor.DARK_GRAY + " \u25CF " + ChatColor.GRAY + "M\u00E9moire "
++                + ChatColor.DARK_GRAY + "\u25B8 " + memColor + usedMb + ChatColor.DARK_GRAY + "/"
++                + ChatColor.GRAY + maxMb + ChatColor.DARK_GRAY + " MB" );
++        // EnoSpigot end
+
+         return true;
+     }
