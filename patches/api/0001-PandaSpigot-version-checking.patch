@@ -22,7 +22,16 @@ index e91e1d8c1215d19a78611d3c8302ed9634bfbda5..62f36e8f9d033c82318141e4edc0636c
 -import org.json.simple.parser.JSONParser;
 -import org.json.simple.parser.ParseException;
 +
-+// EnoSpigot - removed upstream version check imports (no longer needed)
++// PandaSpigot start
++import com.google.gson.Gson;
++import com.google.gson.JsonArray;
++import com.google.gson.JsonObject;
++import com.google.gson.JsonSyntaxException;
++import java.io.InputStreamReader;
++import java.net.HttpURLConnection;
++import java.util.stream.StreamSupport;
++import com.google.gson.JsonElement;
++// PandaSpigot end
  
  public class VersionCommand extends BukkitCommand {
      public VersionCommand(String name) {
@@ -31,9 +40,29 @@ index e91e1d8c1215d19a78611d3c8302ed9634bfbda5..62f36e8f9d033c82318141e4edc0636c
          String version = Bukkit.getVersion();
          if (version == null) version = "Custom";
 +        // PandaSpigot start
-+        // EnoSpigot start - internal server, skip upstream version checking
-+        if (version.startsWith("git-EnoSpigot-") || version.startsWith("git-PandaSpigot-")) {
-+            this.setVersionMessage(ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + "Enofight" + ChatColor.GRAY + " \u2014 " + ChatColor.WHITE + "EnoSpigot " + ChatColor.GREEN + version);
++        if (version.startsWith("git-PandaSpigot-") || version.startsWith("git-EnoSpigot-")) {
++            String[] parts = version.substring(version.indexOf("-", 4) + 1).split("[-\\s]");
++            int distance;
++            try {
++                distance = fetchDownloadApiDistance(Integer.parseInt(parts[0]));
++            } catch (NumberFormatException e) {
++                distance = fetchGitDistance("mimiflo/EnoSpigot", "master", parts[0]);
++            }
++
++            switch (distance) {
++                case -1:
++                    this.setVersionMessage(ChatColor.YELLOW + "Error obtaining version information");
++                    break;
++                case 0:
++                    this.setVersionMessage(ChatColor.GREEN + "You are running the latest version");
++                    break;
++                case -2:
++                    this.setVersionMessage(ChatColor.YELLOW + "Unknown version");
++                    break;
++                default:
++                    this.setVersionMessage(ChatColor.RED + "You are " + distance + " version(s) behind!\n" + ChatColor.RED + "Download the new version at " + ChatColor.GOLD + "https://github.com/mimiflo/EnoSpigot");
++                    break;
++            }
          // PaperSpigot start
 -        if (version.startsWith("git-PaperSpigot-")) {
 +        } else if (version.startsWith("git-PaperSpigot-")) {
@@ -45,7 +74,64 @@ index e91e1d8c1215d19a78611d3c8302ed9634bfbda5..62f36e8f9d033c82318141e4edc0636c
          }
      }
  
-+    // EnoSpigot - upstream version check methods removed (internal server, no update channel)
++    // PandaSpigot start
++    private static int fetchDownloadApiDistance(int runNumber) {
++        try {
++            HttpURLConnection connection = (HttpURLConnection) new URL("https://downloads.hpfxd.com/v2/projects/pandaspigot/versions/1.8.8").openConnection();
++            connection.setRequestProperty("Accept", "application/json");
++            connection.setRequestProperty("User-Agent", "EnoSpigot/" + Bukkit.getVersion());
++            connection.connect();
++            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) return -2;
++            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8))) {
++                JsonObject obj = new Gson().fromJson(reader, JsonObject.class);
++                JsonArray arr = obj.getAsJsonArray("builds");
++                int latest = StreamSupport.stream(arr.spliterator(), false)
++                    .mapToInt(JsonElement::getAsInt)
++                    .max()
++                    .orElse(-1);
++                if (latest < 0) {
++                    return -1;
++                } else {
++                    return latest - runNumber;
++                }
++            } catch (JsonSyntaxException | NumberFormatException e) {
++                e.printStackTrace();
++                return -1;
++            }
++        } catch (IOException e) {
++            e.printStackTrace();
++            return -1;
++        }
++    }
++    private static int fetchGitDistance(String repo, String branch, String hash) {
++        hash = hash.replace("\"", "");
++        try {
++            HttpURLConnection connection = (HttpURLConnection) new URL("https://api.github.com/repos/" + repo + "/compare/" + branch + "..." + hash).openConnection();
++            connection.setRequestProperty("Accept", "application/vnd.github.v3+json");
++            connection.setRequestProperty("User-Agent", "EnoSpigot/" + Bukkit.getVersion());
++            connection.connect();
++            if (connection.getResponseCode() == HttpURLConnection.HTTP_NOT_FOUND) return -2; // Unknown commit
++            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charsets.UTF_8))) {
++                JsonObject obj = new Gson().fromJson(reader, JsonObject.class);
++                String status = obj.get("status").getAsString();
++                switch (status) {
++                    case "identical":
++                        return 0;
++                    case "behind":
++                        return obj.get("behind_by").getAsInt();
++                    default:
++                        return -1;
++                }
++            } catch (JsonSyntaxException | NumberFormatException e) {
++                e.printStackTrace();
++                return -1;
++            }
++        } catch (IOException e) {
++            e.printStackTrace();
++            return -1;
++        }
++    }
++    // PandaSpigot end
 +
      private static int getDistance(String repo, String currentVerInt) { // PaperSpigot
          try {
