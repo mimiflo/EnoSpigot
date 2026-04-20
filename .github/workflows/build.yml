@@ -29,10 +29,12 @@ jobs:
           git config --global init.defaultBranch master
 
       - name: Setup build environment
-        run: ./panda setup
+        id: panda_setup
+        run: ./panda setup 2>&1 | tee /tmp/build-output.log
 
       - name: Apply patches
-        run: ./panda patch
+        id: panda_patch
+        run: ./panda patch 2>&1 | tee -a /tmp/build-output.log
 
       - name: Build
         id: gradle_build
@@ -46,10 +48,10 @@ jobs:
             --console=plain \
             --build-cache \
             --parallel \
-            2>&1 | tee /tmp/build-output.log
+            2>&1 | tee -a /tmp/build-output.log
 
       - name: Commit build log on failure (debug path for sandboxed reviewers)
-        if: failure() && steps.gradle_build.conclusion == 'failure'
+        if: failure()
         env:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
