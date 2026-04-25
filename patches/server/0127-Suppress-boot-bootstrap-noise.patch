@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Enofight <team@enofight.com>
+Date: Fri, 25 Apr 2026 19:00:00 +0000
+Subject: [PATCH] Suppress boot bootstrap noise
+
+Removes the lines printed between container startup and our
+Enofight banner so the brand appears at the very top of console
+output:
+
+  - "Loading libraries, please wait..."     (Main.java println)
+  - JLine "Advanced terminal features..."   (log4j2 status WARN)
+  - "Starting minecraft server version..."  (info, redundant with banner)
+  - "Loading properties"                    (no operational value)
+  - "Default game type: SURVIVAL"           (no operational value)
+
+The first println is removed at source; the remaining four are
+denied via log4j2 RegexFilter / status level. /version still
+shows the full banner with version info.
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index d8d19207e4db256befa886bc9638759ed7c926dc..0000000000000000000000000000000000000001 100644
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -227,7 +227,7 @@ public class Main {
+                 // Spigot End
+                 */
+                 // PandaSpigot end
+-                System.out.println("Loading libraries, please wait...");
++                // Enofight - suppressed: handled by patched banner inside Bukkit.getVersionMessage()
+                 MinecraftServer.main(options);
+             } catch (Throwable t) {
+                 t.printStackTrace();
+diff --git a/src/main/resources/log4j2.xml b/src/main/resources/log4j2.xml
+index 0000000000000000000000000000000000000001..0000000000000000000000000000000000000002 100644
+--- a/src/main/resources/log4j2.xml
++++ b/src/main/resources/log4j2.xml
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<Configuration status="WARN">
++<Configuration status="ERROR">
+     <Appenders>
+         <TerminalConsole name="TerminalConsole">
+             <PatternLayout pattern="%style{[%d{HH:mm:ss}]}{dim} %highlight{%-5level}{FATAL=red bright, ERROR=red bright, WARN=yellow, INFO=white, DEBUG=blue, TRACE=cyan} %style{|}{dim} %minecraftFormatting{%msg}%n%xEx" />
+@@ -18,6 +18,9 @@
+                 <MarkerFilter marker="NETWORK_PACKETS" onMatch="DENY" onMismatch="NEUTRAL" />
+                 <RegexFilter regex=".*Preparing spawn area.*"             onMatch="DENY" onMismatch="NEUTRAL" />
+                 <RegexFilter regex=".*Preparing start region for level.*" onMatch="DENY" onMismatch="NEUTRAL" />
++                <RegexFilter regex=".*Starting minecraft server version.*" onMatch="DENY" onMismatch="NEUTRAL" />
++                <RegexFilter regex=".*Loading properties.*"               onMatch="DENY" onMismatch="NEUTRAL" />
++                <RegexFilter regex=".*Default game type:.*"               onMatch="DENY" onMismatch="NEUTRAL" />
+             </filters>
+             <AppenderRef ref="File"/>
+             <AppenderRef ref="TerminalConsole" level="info"/>
