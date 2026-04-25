@@ -363,7 +363,7 @@ index c126a1e7e68fd8b81e51d8bdb10dd24eccd9db63..627f3b8e88e5d54fb98ee26cf029fd9a
      public co.aikar.timings.Timing timings; // Spigot
      public String getTimingName() {return getName();} // Spigot
  
-@@ -199,11 +199,11 @@ public abstract class Command {
+@@ -199,10 +199,10 @@ public abstract class Command {
  
          if (permissionMessage == null) {
 -            target.sendMessage(ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.");
