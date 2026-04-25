@@ -13,7 +13,7 @@ diff --git a/src/main/java/org/bukkit/Bukkit.java b/src/main/java/org/bukkit/Buk
 index 2ae8b301052020afc17c15435d8022c55cce9675..0000000000000000000000000000000000000001 100644
 --- a/src/main/java/org/bukkit/Bukkit.java
 +++ b/src/main/java/org/bukkit/Bukkit.java
-@@ -90,7 +90,18 @@ public final class Bukkit {
+@@ -90,7 +90,16 @@ public final class Bukkit {
          if ("master".equals(gitBranch) || "main".equals(gitBranch)) {
              branchMsg = "";  // Don't show branch on main/master
          }
