@@ -371,7 +371,7 @@ index c126a1e7e68fd8b81e51d8bdb10dd24eccd9db63..627f3b8e88e5d54fb98ee26cf029fd9a
 -            for (String line : permissionMessage.replace("<permission>", permission).split("\n")) {
 -                target.sendMessage(line);
 -            }
-+            target.sendMessage(org.spigotmc.SpigotConfig.unknownCommandMessage); // Enofight: same text as unknown-command (single config in spigot.yml)
++            target.sendMessage(ChatColor.RED + "Commande inconnue. Utilise /help pour la liste."); // Enofight: matches spigot.yml unknown-command
 +        // PandaSpigot start - Adventure
 +        } else if (!permissionMessage.equals(net.kyori.adventure.text.Component.empty())) {
 +            target.sendMessage(permissionMessage.replaceText(net.kyori.adventure.text.TextReplacementConfig.builder().matchLiteral("<permission>").replacement(permission).build()));
