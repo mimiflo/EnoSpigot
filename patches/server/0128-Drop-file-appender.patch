@@ -1,0 +1,53 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Enofight <team@enofight.com>
+Date: Fri, 25 Apr 2026 20:30:00 +0000
+Subject: [PATCH] Drop file appender, log to stdout only
+
+The RollingRandomAccessFile appender writes to logs/latest.log,
+which is redundant in a containerised deployment — Docker
+already captures stdout via its log driver, and the inner
+filesystem fills up on long-running gameservers, producing:
+
+  AppenderLoggingException: Error writing to RandomAccessFile
+  logs/latest.log
+
+(disk-full inside the container's writable layer).
+
+Removing the File appender:
+  - eliminates the disk-full crash
+  - removes a layer of buffered I/O on the main thread
+  - keeps every line visible via `docker logs` and the
+    aggregated host-side log drivers
+
+Console output is unaffected.
+
+
+diff --git a/src/main/resources/log4j2.xml b/src/main/resources/log4j2.xml
+index 0000000000000000000000000000000000000002..0000000000000000000000000000000000000003 100644
+--- a/src/main/resources/log4j2.xml
++++ b/src/main/resources/log4j2.xml
+@@ -4,16 +4,6 @@
+         <TerminalConsole name="TerminalConsole">
+             <PatternLayout pattern="%style{[%d{HH:mm:ss}]}{dim} %highlight{%-5level}{FATAL=red bright, ERROR=red bright, WARN=yellow, INFO=white, DEBUG=blue, TRACE=cyan} %style{|}{dim} %minecraftFormatting{%msg}%n%xEx" />
+         </TerminalConsole>
+-        <RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz">
+-            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %minecraftFormatting{%msg}{strip}%n" />
+-            <Policies>
+-                <TimeBasedTriggeringPolicy />
+-                <OnStartupTriggeringPolicy />
+-            </Policies>
+-            <DefaultRolloverStrategy max="1000"/>
+-            <Filters>
+-            </Filters>
+-        </RollingRandomAccessFile>
+     </Appenders>
+     <Loggers>
+         <Root level="info">
+@@ -23,7 +13,6 @@
+                 <RegexFilter regex=".*Loading properties.*"               onMatch="DENY" onMismatch="NEUTRAL" />
+                 <RegexFilter regex=".*Default game type:.*"               onMatch="DENY" onMismatch="NEUTRAL" />
+             </filters>
+-            <AppenderRef ref="File"/>
+             <AppenderRef ref="TerminalConsole" level="info"/>
+         </Root>
+     </Loggers>
