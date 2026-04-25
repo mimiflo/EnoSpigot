@@ -23,7 +23,7 @@ new file mode 100644
 index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000001
 --- /dev/null
 +++ b/src/main/java/com/hpfxd/pandaspigot/async/AsyncTracker.java
-@@ -0,0 +1,104 @@
+@@ -0,0 +1,99 @@
 +package com.hpfxd.pandaspigot.async;
 +
 +import com.hpfxd.pandaspigot.config.PandaSpigotConfig;
@@ -112,12 +112,7 @@ index 0000000000000000000000000000000000000000..00000000000000000000000000000000
 +            });
 +        }
 +
-+        try {
-+            pool.invokeAll(tasks);
-+        } catch (InterruptedException e) {
-+            Thread.currentThread().interrupt();
-+            return;
-+        }
++        pool.invokeAll(tasks);
 +
 +        for (EntityPlayer entityplayer : newlyTracking) {
 +            for (EntityTrackerEntry entry : entryList) {
