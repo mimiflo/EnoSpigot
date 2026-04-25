@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Enofight <team@enofight.com>
+Date: Fri, 25 Apr 2026 16:00:00 +0000
+Subject: [PATCH] EnoSpigot pretty console
+
+Cosmetic boot console cleanup:
+
+* Replace the default `[hh:mm:ss INFO]:` log4j2 pattern with a
+  level-coloured one — INFO stays white, WARN turns yellow,
+  ERROR/FATAL bright red — and use a thin pipe separator instead
+  of the bracket noise.
+
+* Drop the `Preparing spawn area: NN%` and
+  `Preparing start region for level N` lines (4-5 spam lines per
+  world boot, no operational value).
+
+Format becomes:
+  [14:32:01] INFO  | Server starting on 0.0.0.0:25565
+  [14:32:01] WARN  | Some warning
+  [14:32:01] ERROR | Something broke
+
+
+diff --git a/src/main/resources/log4j2.xml b/src/main/resources/log4j2.xml
+index a3fcd87111eb9165461a6d1258a1597d2f1340bf..0000000000000000000000000000000000000001 100644
+--- a/src/main/resources/log4j2.xml
++++ b/src/main/resources/log4j2.xml
+@@ -2,7 +2,7 @@
+ <Configuration status="WARN">
+     <Appenders>
+         <TerminalConsole name="TerminalConsole">
+-            <PatternLayout pattern="%highlightError{[%d{HH:mm:ss} %level]: %minecraftFormatting{%msg}%n%xEx}" />
++            <PatternLayout pattern="%style{[%d{HH:mm:ss}]}{dim} %highlight{%-5level}{FATAL=red bright, ERROR=red bright, WARN=yellow, INFO=white, DEBUG=blue, TRACE=cyan} %style{|}{dim} %minecraftFormatting{%msg}%n%xEx" />
+         </TerminalConsole>
+         <RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz">
+             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %minecraftFormatting{%msg}{strip}%n" />
+@@ -16,6 +16,8 @@
+         <Root level="info">
+             <filters>
+                 <MarkerFilter marker="NETWORK_PACKETS" onMatch="DENY" onMismatch="NEUTRAL" />
++                <RegexFilter regex=".*Preparing spawn area.*"             onMatch="DENY" onMismatch="NEUTRAL" />
++                <RegexFilter regex=".*Preparing start region for level.*" onMatch="DENY" onMismatch="NEUTRAL" />
+             </filters>
+             <AppenderRef ref="File"/>
+             <AppenderRef ref="TerminalConsole" level="info"/>
