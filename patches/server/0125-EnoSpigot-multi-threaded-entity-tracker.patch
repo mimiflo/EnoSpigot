@@ -23,7 +23,7 @@ new file mode 100644
 index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000001
 --- /dev/null
 +++ b/src/main/java/com/hpfxd/pandaspigot/async/AsyncTracker.java
-@@ -0,0 +1,97 @@
+@@ -0,0 +1,104 @@
 +package com.hpfxd.pandaspigot.async;
 +
 +import com.hpfxd.pandaspigot.config.PandaSpigotConfig;
@@ -165,7 +165,7 @@ diff --git a/src/main/java/net/minecraft/server/EntityTracker.java b/src/main/ja
 index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000001 100644
 --- a/src/main/java/net/minecraft/server/EntityTracker.java
 +++ b/src/main/java/net/minecraft/server/EntityTracker.java
-@@ -145,6 +145,10 @@ public class EntityTracker {
+@@ -145,4 +145,8 @@ public class EntityTracker {
      }
 
 +    // EnoSpigot start - expose entries for async tracker
@@ -178,7 +178,7 @@ diff --git a/src/main/java/net/minecraft/server/EntityTrackerEntry.java b/src/ma
 index 0b90b6f30ea09fb117281d5ddd2fc752d2c139b5..0000000000000000000000000000000000000001 100644
 --- a/src/main/java/net/minecraft/server/EntityTrackerEntry.java
 +++ b/src/main/java/net/minecraft/server/EntityTrackerEntry.java
-@@ -42,7 +42,7 @@ public class EntityTrackerEntry {
+@@ -42,6 +42,6 @@ public class EntityTrackerEntry {
      // PaperSpigot start
      // Replace trackedPlayers Set with a Map. The value is true until the player receives
      // their first update (which is forced to have absolute coordinates), false afterward.

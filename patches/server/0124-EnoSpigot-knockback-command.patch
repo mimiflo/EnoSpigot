@@ -237,7 +237,7 @@ diff --git a/src/main/java/org/spigotmc/SpigotConfig.java b/src/main/java/org/sp
 index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000001 100644
 --- a/src/main/java/org/spigotmc/SpigotConfig.java
 +++ b/src/main/java/org/spigotmc/SpigotConfig.java
-@@ -266,4 +266,11 @@ public class SpigotConfig
+@@ -266,5 +266,12 @@ public class SpigotConfig
      {
          commands.put( "tps", new TicksPerSecondCommand( "tps" ) );
      }
