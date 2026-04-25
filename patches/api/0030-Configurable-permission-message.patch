@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: EnoFight <claude@enofight.fr>
+Date: Fri, 25 Apr 2026 13:00:00 +0000
+Subject: [PATCH] Configurable permission-denied message
+
+Adds a small CommandMessages holder class with a static, mutable
+permissionDenied field. Plugins can override the value at startup
+(typical pattern: in onLoad set CommandMessages.permissionDenied to
+the desired text), or operators can edit the default below in a fork.
+
+The field is also wired into Command.testPermission so the default
+unmapped permission-denial path renders this configurable text
+instead of a hardcoded literal.
+
+
+diff --git a/src/main/java/org/bukkit/command/CommandMessages.java b/src/main/java/org/bukkit/command/CommandMessages.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000
+--- /dev/null
++++ b/src/main/java/org/bukkit/command/CommandMessages.java
+@@ -0,0 +1,30 @@
++package org.bukkit.command;
++
++import org.bukkit.ChatColor;
++
++/**
++ * Configurable text shown by Bukkit's built-in command framework.
++ *
++ * <p>Each field is a public mutable static — plugins or server
++ * bootstrap code can rewrite them at startup to localise or rebrand
++ * the messages without forking the API.
++ *
++ * <p>Example (typical place: {@code JavaPlugin#onLoad}):
++ * <pre>
++ * &#64;Override
++ * public void onLoad() {
++ *     CommandMessages.permissionDenied =
++ *         org.bukkit.ChatColor.RED + "Pas de permission.";
++ * }
++ * </pre>
++ */
++public final class CommandMessages {
++
++    /** Sent to a player whose {@link Command#testPermission(CommandSender)}
++     *  call returns false and whose command did not set a per-command
++     *  {@code permissionMessage}. */
++    public static String permissionDenied = ChatColor.RED + "Commande inconnue. Utilise /help pour la liste.";
++
++    private CommandMessages() {}
++}
+diff --git a/src/main/java/org/bukkit/command/Command.java b/src/main/java/org/bukkit/command/Command.java
+index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000 100644
+--- a/src/main/java/org/bukkit/command/Command.java
++++ b/src/main/java/org/bukkit/command/Command.java
+@@ -199,6 +199,6 @@ public abstract class Command {
+ 
+         if (permissionMessage == null) {
+-            target.sendMessage(ChatColor.RED + "Commande inconnue. Utilise /help pour la liste."); // Enofight: matches spigot.yml unknown-command
++            target.sendMessage(CommandMessages.permissionDenied); // Enofight: configurable via CommandMessages.permissionDenied
+         // PandaSpigot start - Adventure
+         } else if (!permissionMessage.equals(net.kyori.adventure.text.Component.empty())) {
+             target.sendMessage(permissionMessage.replaceText(net.kyori.adventure.text.TextReplacementConfig.builder().matchLiteral("<permission>").replacement(permission).build()));
