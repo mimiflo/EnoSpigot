@@ -18,7 +18,7 @@ new file mode 100644
 index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000
 --- /dev/null
 +++ b/src/main/java/org/bukkit/command/CommandMessages.java
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,29 @@
 +package org.bukkit.command;
 +
 +import org.bukkit.ChatColor;
