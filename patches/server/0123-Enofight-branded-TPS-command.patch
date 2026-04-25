@@ -44,7 +44,7 @@ index 21fd7ef..5986d3b 100644
      @Override
      public boolean execute(CommandSender sender, String currentAlias, String[] args)
      {
-@@ -23,20 +41,197 @@ public class TicksPerSecondCommand extends Command
+@@ -23,18 +41,196 @@ public class TicksPerSecondCommand extends Command
              return true;
          }
  
