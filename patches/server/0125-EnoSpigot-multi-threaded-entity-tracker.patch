@@ -23,7 +23,7 @@ new file mode 100644
 index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000001
 --- /dev/null
 +++ b/src/main/java/com/hpfxd/pandaspigot/async/AsyncTracker.java
-@@ -0,0 +1,99 @@
+@@ -0,0 +1,112 @@
 +package com.hpfxd.pandaspigot.async;
 +
 +import com.hpfxd.pandaspigot.config.PandaSpigotConfig;
@@ -112,7 +112,20 @@ index 0000000000000000000000000000000000000000..00000000000000000000000000000000
 +            });
 +        }
 +
-+        pool.invokeAll(tasks);
++        // Spigot's AsyncCatcher throws IllegalStateException whenever
++        // EntityTrackerEntry.updatePlayer() is called off the main thread.
++        // Our tracker collections (trackedPlayerMap, removeQueue) are
++        // already thread-safe, and packet I/O goes through Netty which is
++        // thread-safe. The main thread is parked inside invokeAll() until
++        // every worker finishes, so disabling the catcher here is race-free
++        // — we restore it before invokeAll() returns control.
++        boolean wasEnabled = org.spigotmc.AsyncCatcher.enabled;
++        org.spigotmc.AsyncCatcher.enabled = false;
++        try {
++            pool.invokeAll(tasks);
++        } finally {
++            org.spigotmc.AsyncCatcher.enabled = wasEnabled;
++        }
 +
 +        for (EntityPlayer entityplayer : newlyTracking) {
 +            for (EntityTrackerEntry entry : entryList) {
